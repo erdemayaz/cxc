@@ -1,0 +1,34 @@
+
+int goal, match = -135;
+double scores[10];
+
+int main(int argc, char* argv[]) {
+	printf("Hello CX!");
+	Erdem *erdem = ErdemVertex();
+	erdem.age = 200;
+	erdem.hello(102.8);
+	return 0;
+}
+
+vertex Erdem {
+	int age = 100;
+	char** name = "erdem ayaz", school = "karabuk university";
+	public double point1 = 1001.65, point2 = 1351.97, point3;
+	
+	public Erdem() {
+		printf("Erdem vertex start\n");
+	}
+	
+	void hello(double y) {
+		float x = 10.86;
+	}
+	
+	int howru(char str[]) {
+		printf("%s\n", str);
+		return 99;
+	}
+	
+	int fine(int asd) {
+		return 101;
+	}
+}
