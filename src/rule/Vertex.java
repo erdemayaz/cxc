@@ -16,8 +16,8 @@ public class Vertex extends Rule implements RuleAction, Serializable {
     
     private String identifier;
     
-    private final ArrayList<Declaration> declarations = new ArrayList<>();
-    private final ArrayList<Function> functions = new ArrayList<>();
+    private ArrayList<Declaration> declarations = null;
+    private ArrayList<Function> functions = null;
     
     public String getIdentifier() {
         return identifier;
@@ -28,6 +28,8 @@ public class Vertex extends Rule implements RuleAction, Serializable {
     }
     
     public void addDeclarations(ArrayList<Declaration> declaration) {
+        if(declarations == null)
+            declarations = new ArrayList<>();
         declarations.addAll(declaration);
     }
     
@@ -36,6 +38,8 @@ public class Vertex extends Rule implements RuleAction, Serializable {
     }
     
     public void addFunction(Function function) {
+        if(functions == null)
+            functions = new ArrayList<>();
         functions.add(function);
     }
     

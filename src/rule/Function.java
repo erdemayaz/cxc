@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.antlr.v4.runtime.tree.ParseTree;
 import rule.Declaration.DeclarationListener;
+import rule.Statement.StatementListener;
 
 /**
  *
@@ -26,8 +27,8 @@ public class Function extends Rule implements RuleAction, Serializable {
     private int functionStop;
     private String pointer = null;
     private Modifier modifier = null;
-    private ArrayList<Declaration> declarations;
-    private ArrayList<Statement> statements;
+    private ArrayList<Declaration> declarations = null;
+    private ArrayList<Statement> statements = null;
     private final ArrayList<String> specifiers;
     private final ArrayList<ArrayList<String>> parameterSpecifiers;
 
@@ -116,14 +117,20 @@ public class Function extends Rule implements RuleAction, Serializable {
     }
     
     public void addDeclaration(Declaration declaration) {
+        if(declarations == null)
+            declarations = new ArrayList<>();
         declarations.add(declaration);
     }
     
     public void addDeclarations(ArrayList<Declaration> declarations) {
-        declarations.addAll(declarations);
+        if(this.declarations == null)
+            this.declarations = new ArrayList<>();
+        this.declarations.addAll(declarations);
     }
     
     public void addStatement(Statement statement) {
+        if(statements == null)
+            statements = new ArrayList<>();
         statements.add(statement);
     }
 
@@ -232,12 +239,14 @@ public class Function extends Rule implements RuleAction, Serializable {
                             .tree2list(ctx.compoundStatement().blockItemList(), 2);
                     pt.stream().forEach((p) -> {
                         BlockItemContext bictx = (BlockItemContext) p;
-                        if(bictx.declaration() != null) {
+                        if(bictx.declaration() != null) { // declaration
                             DeclarationListener dl = new DeclarationListener(source);
                             bictx.declaration().enterRule(dl);
                             f.addDeclarations(dl.getDeclarations());
                         } else { // statement
-                            
+                            StatementListener sl = new StatementListener(source);
+                            bictx.statement().enterRule(sl);
+                            f.addStatement(sl.getStatement());
                         }
                     });
                 }
