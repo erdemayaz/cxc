@@ -39,7 +39,25 @@ public class Function extends Rule implements RuleAction, Serializable {
     
     @Override
     public void analyze() {
+        // declarations analysis
+        if(declarations != null) {
+            ArrayList<String> declarationNames = new ArrayList<>();
+            declarations.stream().forEach((d) -> {
+                if(!declarationNames.contains(d.getIdentifier())) {
+                    declarationNames.add(d.getIdentifier());
+                } else {
+                    cxc.Error.message(cxc.Error.MULTIPLE_IDENTIFIER, 
+                            "Multiple declaration identifier '" + 
+                                    d.getIdentifier() + "' in " + identifier);
+                }
+                d.analyze(); 
+            });
+        }
         
+        // statements analysis
+        if(statements != null) {
+            statements.stream().forEach((s) -> { s.analyze(); });
+        }
     }
 
     @Override
@@ -114,6 +132,10 @@ public class Function extends Rule implements RuleAction, Serializable {
     
     public void addParameterSpecifiers(ArrayList<String> specifiers) {
         parameterSpecifiers.add(specifiers);
+    }
+
+    public ArrayList<ArrayList<String>> getParameterSpecifiers() {
+        return parameterSpecifiers;
     }
     
     public void addDeclaration(Declaration declaration) {

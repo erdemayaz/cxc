@@ -14,14 +14,12 @@ import org.antlr.v4.runtime.tree.ParseTree;
  * @author Erdem Ayaz
  */
 public class Declaration extends Rule implements RuleAction, Serializable {
-    private boolean independent = true;
     private Modifier modifier = null;
     private String identifier = null;
     private String text = null;
     private String pointer = null;
     private String specifiers = null;
     private String initValue = null;
-    private String functionName = null;
     
     @Override
     public void analyze() {
@@ -36,14 +34,6 @@ public class Declaration extends Rule implements RuleAction, Serializable {
     @Override
     public void assemble() {
         
-    }
-
-    public boolean isIndependent() {
-        return independent;
-    }
-
-    public void setIndependent(boolean independent) {
-        this.independent = independent;
     }
 
     public Modifier getModifier() {
@@ -92,14 +82,6 @@ public class Declaration extends Rule implements RuleAction, Serializable {
 
     public void setInitValue(String initValue) {
         this.initValue = initValue;
-    }
-
-    public String getFunctionName() {
-        return functionName;
-    }
-
-    public void setFunctionName(String functionName) {
-        this.functionName = functionName;
     }
     
     public static class DeclarationListener extends CXBaseListener {

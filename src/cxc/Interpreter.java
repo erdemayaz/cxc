@@ -68,6 +68,7 @@ public class Interpreter extends Thread {
     
     private void analyze() {
         Analyzer a = new Analyzer(tree);
+        a.analyze();
     }
     
     private void coding() {

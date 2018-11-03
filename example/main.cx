@@ -19,8 +19,13 @@ vertex Erdem {
 		printf("Erdem vertex start\n");
 	}
 	
-	void hello(double y) {
+	void hello(const double y, double t) {
 		float x = 10.86;
+	}
+	
+	void hello(double y, const double t) {
+		float x = 10.86;
+		float z = 10.87;
 	}
 	
 	int howru(char str[]) {
