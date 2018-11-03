@@ -20,7 +20,7 @@ public class CXC {
             }
             ex.shutdown();
         } else {
-            System.err.println("Need parameter");
+            Error.message(Error.NEED_PARAMETER, "Need parameter");
         }
     }
     

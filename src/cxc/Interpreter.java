@@ -3,7 +3,6 @@ package cxc;
 import antlr.CXLexer;
 import antlr.CXParser;
 import java.io.IOException;
-import static java.lang.System.exit;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import org.antlr.v4.runtime.CharStream;
@@ -26,23 +25,22 @@ public class Interpreter extends Thread {
             this.sourceName = sourceName;
         } else {
             this.sourceName = null;
-            System.err.println("File extension is not avaible");
-            exit(-1);
+            Error.message(Error.UNAVAIBLE_EXTENSION, 
+                    "File extension is not avaible. It must be 'cx'");
         }
     }
     
     private void read() {
-        String source = "";
+        String source = null;
         
         try {
             source = new String(Files.readAllBytes(Paths.get(sourceName)));
         } catch (IOException ex) {
-            System.err.println("Source file cannot read");
+            Error.message(Error.READING_EXCEPTION, "Source file cannot read");
         }
         
-        if(source.equals("")) {
-            System.err.println("Source file cannot read");
-            exit(-1);
+        if(source == null) {
+            Error.message(Error.EMPTY_SOURCE, "Source file empty");
         } else {
             sourceString = source;
         }
@@ -54,8 +52,7 @@ public class Interpreter extends Thread {
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         parser = new CXParser(tokens);
         if(parser == null) {
-            System.err.println("Parser error");
-            exit(-1);
+            Error.message(Error.PARSER_ERROR, "Parser error");
         }
         
 //        TreeViewer tv = new TreeViewer(Arrays.asList(parser.getRuleNames()), 
