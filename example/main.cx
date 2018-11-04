@@ -23,7 +23,7 @@ vertex Erdem {
 		float x = 10.86;
 	}
 	
-	void hello(double y, const double t) {
+	void hello(double y, const int t) {
 		float x = 10.86;
 		float z = 10.87;
 	}

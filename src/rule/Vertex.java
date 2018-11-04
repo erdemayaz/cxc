@@ -49,6 +49,7 @@ public class Vertex extends Rule implements RuleAction, Serializable {
     }
     
     private void parameterSpecifiersAnalysis(int bottom, int top) {
+        boolean same = true;
         for(int k = 0; k < functions.get(bottom)
                 .getParameterSpecifiers().size(); ++k) {
             ArrayList<String> common 
@@ -56,19 +57,28 @@ public class Vertex extends Rule implements RuleAction, Serializable {
                                 .getParameterSpecifiers().get(k), 
                                 functions.get(top).getParameterSpecifiers().get(k));
             if(common.size() > 0) {
-                common.stream().forEach((c) -> {
-                    if(c.equals("void") || c.equals("char") || c.equals("short") || 
-                       c.equals("int") || c.equals("long") || c.equals("float") || 
-                       c.equals("double") || c.equals("signed") || c.equals("unsigned") || 
-                       c.equals("_Bool") || c.equals("_Complex") || c.equals("__m128") || 
-                       c.equals("void") || c.equals("__m128d") || c.equals("__m128i") || 
-                       c.startsWith("__extension__") || c.startsWith("__typeof__")) {
-                        Error.message(Error.OVERLOADING_ERROR, 
-                                "cannot overload with same parameters(function '" 
-                                        + functions.get(top).getIdentifier() + "')");
+                for(String c : common) {
+                    // is type specifier
+                    if(!(c.equals("void")   || c.equals("char")     || c.equals("short")    || 
+                       c.equals("int")      || c.equals("long")     || c.equals("float")    || 
+                       c.equals("double")   || c.equals("signed")   || c.equals("unsigned") || 
+                       c.equals("_Bool")    || c.equals("_Complex") || c.equals("__m128")   || 
+                       c.equals("void")     || c.equals("__m128d")  || c.equals("__m128i")  || 
+                       c.startsWith("__extension__") || c.startsWith("__typeof__"))) {
+                        same = false;
+                        break;
                     }
-                });
+                }
+            } else {
+                same = false;
+                break;
             }
+        }
+        
+        if(same) {
+            Error.message(Error.OVERLOADING_ERROR, 
+                "cannot overload with same parameters(function '" 
+                        + functions.get(top).getIdentifier() + "')");
         }
     }
     
