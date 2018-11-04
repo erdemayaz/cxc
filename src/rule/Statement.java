@@ -11,6 +11,7 @@ import java.io.Serializable;
  */
 public class Statement extends Rule implements RuleAction, Serializable {
     private Class context;
+    private Function parent = null;
     
     
     @Override
@@ -34,6 +35,14 @@ public class Statement extends Rule implements RuleAction, Serializable {
 
     public void setContext(Class context) {
         this.context = context;
+    }
+
+    public Function getParent() {
+        return parent;
+    }
+
+    public void setParent(Function parent) {
+        this.parent = parent;
     }
     
     public static class StatementListener extends CXBaseListener {

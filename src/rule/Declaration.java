@@ -3,6 +3,7 @@ package rule;
 import antlr.CXBaseListener;
 import antlr.CXParser;
 import antlr.CXParser.InitDeclaratorContext;
+import cxc.Error;
 import cxc.Modifier;
 import cxc.Util;
 import java.io.Serializable;
@@ -14,6 +15,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
  * @author Erdem Ayaz
  */
 public class Declaration extends Rule implements RuleAction, Serializable {
+    private Rule parent = null;
     private Modifier modifier = null;
     private String identifier = null;
     private String text = null;
@@ -23,7 +25,7 @@ public class Declaration extends Rule implements RuleAction, Serializable {
     
     @Override
     public void analyze() {
-        
+        modifierAnalysis();
     }
 
     @Override
@@ -34,6 +36,23 @@ public class Declaration extends Rule implements RuleAction, Serializable {
     @Override
     public void assemble() {
         
+    }
+    
+    private void modifierAnalysis() {
+        if(modifier != Modifier.DEFAULT && 
+                (parent == null || parent.getClass() == Function.class)) {
+            Error.message(Error.INCOMPATIBLE_MODIFIER, 
+                    "Usage of modifier is incompatible for declaration '" + 
+                            identifier + "'");
+        }
+    }
+
+    public Rule getParent() {
+        return parent;
+    }
+
+    public void setParent(Rule parent) {
+        this.parent = parent;
     }
 
     public Modifier getModifier() {

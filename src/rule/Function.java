@@ -27,6 +27,7 @@ public class Function extends Rule implements RuleAction, Serializable {
     private int functionStop;
     private String pointer = null;
     private Modifier modifier = null;
+    private Vertex parent = null;
     private ArrayList<Declaration> declarations = null;
     private ArrayList<Statement> statements = null;
     private final ArrayList<String> specifiers;
@@ -39,6 +40,9 @@ public class Function extends Rule implements RuleAction, Serializable {
     
     @Override
     public void analyze() {
+        // modifier control
+        modifierAnalysis();
+        
         // declarations analysis
         if(declarations != null) {
             ArrayList<String> declarationNames = new ArrayList<>();
@@ -68,6 +72,14 @@ public class Function extends Rule implements RuleAction, Serializable {
     @Override
     public void assemble() {
         
+    }
+    
+    private void modifierAnalysis() {
+        if(modifier != Modifier.DEFAULT && parent == null) {
+            cxc.Error.message(cxc.Error.INCOMPATIBLE_MODIFIER, 
+                    "Usage of modifier is incompatible for function '" 
+                            + identifier + "'");
+        }
     }
 
     public String getIdentifier() {
@@ -124,6 +136,14 @@ public class Function extends Rule implements RuleAction, Serializable {
 
     public void setModifier(Modifier modifier) {
         this.modifier = modifier;
+    }
+
+    public Vertex getParent() {
+        return parent;
+    }
+
+    public void setParent(Vertex parent) {
+        this.parent = parent;
     }
     
     public void addSpecifier(String specifier) {
@@ -264,10 +284,14 @@ public class Function extends Rule implements RuleAction, Serializable {
                         if(bictx.declaration() != null) { // declaration
                             DeclarationListener dl = new DeclarationListener(source);
                             bictx.declaration().enterRule(dl);
+                            dl.getDeclarations().stream().forEach((decl) -> {
+                                decl.setParent(f);
+                            });
                             f.addDeclarations(dl.getDeclarations());
                         } else { // statement
                             StatementListener sl = new StatementListener(source);
                             bictx.statement().enterRule(sl);
+                            sl.getStatement().setParent(f);
                             f.addStatement(sl.getStatement());
                         }
                     });

@@ -14,6 +14,7 @@ public class Error {
     public static final int PARSER_ERROR = 13;
     public static final int MULTIPLE_IDENTIFIER = 14;
     public static final int OVERLOADING_ERROR = 15;
+    public static final int INCOMPATIBLE_MODIFIER = 16;
     
     public static void message(int code, String text) {
         System.err.println("[" + code + "] " + text);

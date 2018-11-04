@@ -152,12 +152,16 @@ public class Vertex extends Rule implements RuleAction, Serializable {
                 ctx.declaration().stream().forEach((d) -> {
                     DeclarationListener dl = new DeclarationListener(source);
                     d.enterRule(dl);
+                    dl.getDeclarations().stream().forEach((decl) -> {
+                        decl.setParent(v);
+                    });
                     v.addDeclarations(dl.getDeclarations());
                 });
                 
                 ctx.functionDefinition().stream().forEach((f) -> {
                     FunctionListener fl = new FunctionListener(source);
                     f.enterRule(fl);
+                    fl.getFunction().setParent(v);
                     v.addFunction(fl.getFunction());
                 });
             }
