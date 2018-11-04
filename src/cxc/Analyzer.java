@@ -1,6 +1,7 @@
 package cxc;
 
 import java.util.ArrayList;
+import rule.Declaration;
 
 /**
  *
@@ -14,6 +15,11 @@ public class Analyzer {
     }
     
     public void analyze() {
+        ruleAnalysis();
+        usageAnalysis();
+    }
+    
+    private void ruleAnalysis() {
         if(tree.getDeclarations() != null) {
             ArrayList<String> declarationNames = new ArrayList<>();
             tree.getDeclarations().stream().forEach((d) -> {
@@ -55,5 +61,44 @@ public class Analyzer {
                 v.analyze();
             });
         }
+    }
+    
+    private void usageAnalysis() {
+        ArrayList<Declaration> decls = new ArrayList<>();
+        if(tree.getDeclarations() != null)
+            decls.addAll(tree.getDeclarations());
+        
+        if(tree.getFunctions() != null) {
+            tree.getFunctions().stream().forEach((f) -> {
+                if(f.getDeclarations() != null)
+                    decls.addAll(f.getDeclarations());
+            });
+        }
+        
+        if(tree.getVertexes() != null) {
+            tree.getVertexes().stream().forEach((v) -> {
+                if(v.getDeclarations() != null)
+                    decls.addAll(v.getDeclarations());
+
+                if(v.getFunctions() != null) {
+                    v.getFunctions().stream().forEach((f) -> {
+                        if(f.getDeclarations() != null)
+                            decls.addAll(f.getDeclarations());
+                    });
+                }
+            });
+        }
+        
+        tree.getVertexes().stream().forEach((v) -> {
+            decls.stream().forEach((d) -> {
+                if(v.getIdentifier().equals(d.getSpecifiers())) {
+                    findUsage(d.getIdentifier());
+                }
+            });
+        });
+    }
+    
+    private void findUsage(String identifier) {
+        // find all expression statements that includes the identifier
     }
 }

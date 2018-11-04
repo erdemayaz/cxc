@@ -4,7 +4,7 @@ double scores[10];
 
 int main(int argc, char* argv[]) {
 	printf("Hello CX!");
-	Erdem *erdem = ErdemVertex();
+	Erdem erdem = ErdemVertex();
 	erdem.age = 200;
 	erdem.hello(102.8);
 	return 0;
