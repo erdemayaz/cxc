@@ -1,5 +1,6 @@
 package cxc;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import rule.Declaration;
 import rule.Function;
@@ -9,7 +10,7 @@ import rule.Vertex;
  *
  * @author Erdem Ayaz
  */
-public class AST {
+public class AST implements Serializable {
     private ArrayList<Declaration> declarations;
     private ArrayList<Function> functions;
     private ArrayList<Vertex> vertexes;

@@ -2,8 +2,15 @@ package rule;
 
 import antlr.CXBaseListener;
 import antlr.CXParser;
+import antlr.CXParser.CompoundStatementContext;
+import antlr.CXParser.ExpressionContext;
+import antlr.CXParser.IterationStatementContext;
+import antlr.CXParser.JumpStatementContext;
+import antlr.CXParser.LabeledStatementContext;
+import antlr.CXParser.SelectionStatementContext;
 import cxc.Util;
 import java.io.Serializable;
+import rule.Expression.ExpressionListener;
 
 /**
  *
@@ -12,11 +19,13 @@ import java.io.Serializable;
 public class Statement extends Rule implements RuleAction, Serializable {
     private Class context;
     private Function parent = null;
+    private Expression expression = null;
     
     
     @Override
     public void analyze() {
-        
+        if(expression != null)
+            expression.analyze();
     }
 
     @Override
@@ -44,6 +53,14 @@ public class Statement extends Rule implements RuleAction, Serializable {
     public void setParent(Function parent) {
         this.parent = parent;
     }
+
+    public Expression getExpression() {
+        return expression;
+    }
+
+    public void setExpression(Expression expression) {
+        this.expression = expression;
+    }
     
     public static class StatementListener extends CXBaseListener {
         private final Statement s;
@@ -58,6 +75,28 @@ public class Statement extends Rule implements RuleAction, Serializable {
         public void enterStatement(CXParser.StatementContext ctx) {
             if(ctx != null) {
                 s.setText(Util.getRuleText(source, ctx));
+                if(ctx.expressionStatement() != null) {
+                    s.setContext(ExpressionContext.class);
+                    if(ctx.expressionStatement().expression() != null) {
+                        ExpressionListener el = new ExpressionListener(source);
+                        el.enterExpression(ctx.expressionStatement().expression());
+                        el.getExpression().setParent(s);
+                        s.setExpression(el.getExpression());
+                    }
+                } else if(ctx.selectionStatement() != null) {
+                    s.setContext(SelectionStatementContext.class);
+                } else if(ctx.iterationStatement() != null) {
+                    s.setContext(IterationStatementContext.class);
+                } else if(ctx.jumpStatement() != null) {
+                    s.setContext(JumpStatementContext.class);
+                } else if(ctx.compoundStatement() != null) {
+                    s.setContext(CompoundStatementContext.class);
+                } else if(ctx.labeledStatement() != null) {
+                    s.setContext(LabeledStatementContext.class);
+                } else {
+                    // __asm
+                    s.setContext(null);
+                }
             }
         }
 
