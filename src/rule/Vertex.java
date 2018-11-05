@@ -84,6 +84,27 @@ public class Vertex extends Rule implements RuleAction, Serializable {
     
     @Override
     public void analyze() {
+        // constructor analysis
+        if(functions != null && functions.size() > 0) {
+            int cCount = 0;
+            for(Function f : functions) {
+                if(f.getIdentifier().equals(identifier)) {
+                    if(f.getSpecifiers().size() > 0) {
+                        Error.message(Error.CONSTRUCTOR_SPECIFIER, 
+                            "Vertex constructor cannot has specifier in '" + 
+                                    identifier + "'");
+                    } else {
+                        cCount++;
+                    }
+                }
+            }
+            if(cCount > 1) {
+                cxc.Error.message(cxc.Error.MULTIPLE_CONSTRUCTOR, 
+                            "Vertex can only have one constructor(vertex '" + 
+                                    identifier + "')");
+            }
+        }
+        
         // declarations analysis
         if(declarations != null) {
             ArrayList<String> declarationNames = new ArrayList<>();

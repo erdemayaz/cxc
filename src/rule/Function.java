@@ -142,6 +142,10 @@ public class Function extends Rule implements RuleAction, Serializable {
         return parent;
     }
 
+    public ArrayList<String> getSpecifiers() {
+        return specifiers;
+    }
+
     public void setParent(Vertex parent) {
         this.parent = parent;
     }
