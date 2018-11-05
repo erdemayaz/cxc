@@ -16,6 +16,7 @@ public class CXC {
                     getRuntime().availableProcessors());
             for(String arg : args) {
                 Interpreter i = new Interpreter(arg);
+                i.viewTree(false);
                 ex.submit(i);
             }
             ex.shutdown();

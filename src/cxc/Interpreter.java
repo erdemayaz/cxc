@@ -5,6 +5,8 @@ import antlr.CXParser;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import org.antlr.v4.gui.TreeViewer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -18,6 +20,7 @@ public class Interpreter extends Thread {
     private String sourceString;
     private CXParser parser;
     private AST tree;
+    private boolean viewTree;
     private long begin, end;
     
     public Interpreter(String sourceName) {
@@ -28,6 +31,7 @@ public class Interpreter extends Thread {
             Error.message(Error.UNAVAIBLE_EXTENSION, 
                     "File extension is not avaible. It must be 'cx'");
         }
+        viewTree = false;
     }
     
     private void read() {
@@ -54,10 +58,6 @@ public class Interpreter extends Thread {
         if(parser == null) {
             Error.message(Error.PARSER_ERROR, "Parser error");
         }
-        
-//        TreeViewer tv = new TreeViewer(Arrays.asList(parser.getRuleNames()), 
-//                parser.compilationUnit());
-//        tv.open();
     }
     
     private void construct() {
@@ -84,12 +84,18 @@ public class Interpreter extends Thread {
         begin = System.currentTimeMillis();
         read();
         parse();
-        construct();
-        analyze();
-        coding();
-        assemble();
-        end = System.currentTimeMillis();
-        System.out.println("Interpreter Runtime : " + (end - begin) + "ms");
+        if(!viewTree) {
+            construct();
+            analyze();
+            coding();
+            assemble();
+            end = System.currentTimeMillis();
+            System.out.println("Interpreter Runtime : " + (end - begin) + "ms");
+        } else {
+            TreeViewer tv = new TreeViewer(Arrays.asList(parser.getRuleNames()), 
+            parser.compilationUnit());
+            tv.open();
+        }
         super.run();
     }
     
@@ -99,5 +105,9 @@ public class Interpreter extends Thread {
     
     public String getSourceString() {
         return sourceString;
+    }
+    
+    public void viewTree(boolean tree) {
+        viewTree = tree;
     }
 }

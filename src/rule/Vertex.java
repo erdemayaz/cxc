@@ -16,6 +16,7 @@ import rule.Function.FunctionListener;
 public class Vertex extends Rule implements RuleAction, Serializable {
     
     private String identifier;
+    private Function constructor = null;
     
     private ArrayList<Declaration> declarations = null;
     private ArrayList<Function> functions = null;
@@ -26,6 +27,10 @@ public class Vertex extends Rule implements RuleAction, Serializable {
 
     public void setIdentifier(String identifier) {
         this.identifier = identifier;
+    }
+
+    public Function getConstructor() {
+        return constructor;
     }
     
     public void addDeclarations(ArrayList<Declaration> declaration) {
@@ -87,6 +92,7 @@ public class Vertex extends Rule implements RuleAction, Serializable {
         // constructor analysis
         if(functions != null && functions.size() > 0) {
             int cCount = 0;
+            Function c = null;
             for(Function f : functions) {
                 if(f.getIdentifier().equals(identifier)) {
                     if(f.getSpecifiers().size() > 0) {
@@ -94,6 +100,7 @@ public class Vertex extends Rule implements RuleAction, Serializable {
                             "Vertex constructor cannot has specifier in '" + 
                                     identifier + "'");
                     } else {
+                        c = f;
                         cCount++;
                     }
                 }
@@ -102,6 +109,8 @@ public class Vertex extends Rule implements RuleAction, Serializable {
                 cxc.Error.message(cxc.Error.MULTIPLE_CONSTRUCTOR, 
                             "Vertex can only have one constructor(vertex '" + 
                                     identifier + "')");
+            } else if(cCount == 1) {
+                constructor = c;
             }
         }
         
