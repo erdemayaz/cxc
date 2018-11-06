@@ -26,6 +26,21 @@ public class Util {
         return source.substring(ctx.start.getStartIndex(), ctx.stop.getStopIndex() + 1);
     }
     
+    public static int getRuleLine(String source, ParserRuleContext ctx) {
+        return ctx.start.getLine();
+    }
+    
+    public static ParserRuleContext findRule(ParserRuleContext root, Class wanted) {
+        for(int i = 0; i < root.getChildCount(); ++i) {
+            if(root.getChild(i).getClass().equals(wanted)) {
+                return root;
+            } else {
+                return findRule((ParserRuleContext) root.getChild(i), wanted);
+            }
+        }
+        return null;
+    }
+    
     public static ArrayList<String> stringListRetain(List<String> a, List<String> b) {
         ArrayList<String> l = new ArrayList<>(a);
         l.retainAll(b);

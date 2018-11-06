@@ -2,14 +2,17 @@ package rule;
 
 import antlr.CXBaseListener;
 import antlr.CXParser;
+import antlr.CXParser.AssignmentExpressionContext;
 import antlr.CXParser.CompoundStatementContext;
 import antlr.CXParser.ExpressionContext;
+import antlr.CXParser.ExpressionStatementContext;
 import antlr.CXParser.IterationStatementContext;
 import antlr.CXParser.JumpStatementContext;
 import antlr.CXParser.LabeledStatementContext;
 import antlr.CXParser.SelectionStatementContext;
 import cxc.Util;
 import java.io.Serializable;
+import java.util.ArrayList;
 import rule.Expression.ExpressionListener;
 
 /**
@@ -19,13 +22,14 @@ import rule.Expression.ExpressionListener;
 public class Statement extends Rule implements RuleAction, Serializable {
     private Class context;
     private Function parent = null;
-    private Expression expression = null;
+    private ArrayList<Expression> expressions = null;
     
     
     @Override
     public void analyze() {
-        if(expression != null)
-            expression.analyze();
+        if(context == ExpressionStatementContext.class) {
+            expressions.stream().forEach((e) -> { e.analyze(); });
+        }
     }
 
     @Override
@@ -54,12 +58,12 @@ public class Statement extends Rule implements RuleAction, Serializable {
         this.parent = parent;
     }
 
-    public Expression getExpression() {
-        return expression;
+    public ArrayList<Expression> getExpressions() {
+        return expressions;
     }
 
-    public void setExpression(Expression expression) {
-        this.expression = expression;
+    public void addExpression(Expression expression) {
+        this.expressions.add(expression);
     }
     
     public static class StatementListener extends CXBaseListener {
@@ -78,10 +82,14 @@ public class Statement extends Rule implements RuleAction, Serializable {
                 if(ctx.expressionStatement() != null) {
                     s.setContext(ExpressionContext.class);
                     if(ctx.expressionStatement().expression() != null) {
-                        ExpressionListener el = new ExpressionListener(source);
-                        el.enterExpression(ctx.expressionStatement().expression());
-                        el.getExpression().setParent(s);
-                        s.setExpression(el.getExpression());
+                        s.expressions = new ArrayList<>();
+                        Util.tree2list(ctx.expressionStatement().expression(), 3)
+                        .stream().forEach((pt) -> {
+                            ExpressionListener el = new ExpressionListener(source);
+                            el.enterAssignmentExpression((AssignmentExpressionContext) pt);
+                            el.getExpression().setParent(s);
+                            s.addExpression(el.getExpression());
+                        });
                     }
                 } else if(ctx.selectionStatement() != null) {
                     s.setContext(SelectionStatementContext.class);

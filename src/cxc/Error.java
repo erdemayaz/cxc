@@ -17,13 +17,14 @@ public class Error {
     public static final int INCOMPATIBLE_MODIFIER = 17;
     public static final int CONSTRUCTOR_SPECIFIER = 18;
     public static final int MULTIPLE_CONSTRUCTOR  = 19;
+    public static final int MULTIPLE_ASSIGNMENT   = 20;
     
     public static void message(int code, String text) {
-        System.err.println("[" + code + "] " + text);
+        System.err.println("[" + code + "] Error: " + text);
         exit(0);
     }
     public static void message(int code, String text, int line) {
-        System.err.println("[" + code + "] " + text + " on line " + line);
+        System.err.println("[" + code + "] Error: " + text + " on line " + line);
         exit(0);
     }
 }

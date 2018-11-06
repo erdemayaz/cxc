@@ -81,22 +81,30 @@ public class Interpreter extends Thread {
 
     @Override
     public void run() {
-        begin = System.currentTimeMillis();
-        read();
-        parse();
-        if(!viewTree) {
-            construct();
-            analyze();
-            coding();
-            assemble();
-            end = System.currentTimeMillis();
-            System.out.println("Interpreter Runtime : " + (end - begin) + "ms");
-        } else {
-            TreeViewer tv = new TreeViewer(Arrays.asList(parser.getRuleNames()), 
-            parser.compilationUnit());
-            tv.open();
+        try {
+            begin = System.currentTimeMillis();
+            read();
+            parse();
+            if(!viewTree) {
+                construct();
+                analyze();
+                coding();
+                assemble();
+                end = System.currentTimeMillis();
+                System.out.println("Interpreter Runtime : " + (end - begin) + "ms");
+            } else {
+                TreeViewer tv = new TreeViewer(Arrays.asList(parser.getRuleNames()), 
+                parser.compilationUnit());
+                tv.open();
+            }
+            super.run();
+        } catch (Throwable t) {
+            System.err.println(t);
+            for(StackTraceElement ste : t.getStackTrace()) {
+                System.err.println(ste);
+            }
+            
         }
-        super.run();
     }
     
     public String getSourceName() {

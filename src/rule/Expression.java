@@ -2,6 +2,9 @@ package rule;
 
 import antlr.CXBaseListener;
 import antlr.CXParser;
+import antlr.CXParser.UnaryExpressionContext;
+import cxc.Error;
+import cxc.Util;
 import java.io.Serializable;
 
 /**
@@ -47,7 +50,28 @@ public class Expression extends Rule implements RuleAction, Serializable {
         }
 
         @Override
-        public void enterExpression(CXParser.ExpressionContext ctx) {
+        public void enterAssignmentExpression(CXParser.AssignmentExpressionContext ctx) {
+            
+            if(ctx.assignmentOperator() != null) {
+                if(ctx.assignmentExpression().assignmentOperator() != null) {
+                    // error for ... = ... = ...
+                    Error.message(Error.MULTIPLE_ASSIGNMENT, 
+                            "Multiple assignment in expression statement", 
+                            Util.getRuleLine(source, ctx.assignmentExpression()
+                                    .assignmentOperator()));
+                } else if(ctx.assignmentExpression().conditionalExpression() != null) {
+                    
+                } else {
+                    // digit sequence in right of assignment
+                }
+            } else if (ctx.conditionalExpression() != null) {
+                
+            } else {
+                // digit sequence
+            }
+        }
+        
+        private void unaryExpressionAnalysis(UnaryExpressionContext uectx) {
             
         }
 

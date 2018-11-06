@@ -6,7 +6,8 @@ int main(int argc, char* argv[]) {
 	printf("Hello CX!");
 	Erdem erdem = ErdemVertex();
 	erdem.age = 200;
-	erdem.hello(102.8);
+	erdem.point1 = 3000.00, erdem.point2 = 4000.00, erdem.point3 = 5000.00;
+	erdem.hello(102.8).howru("led viri");
 	return 0;
 }
 
