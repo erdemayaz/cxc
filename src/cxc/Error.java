@@ -18,6 +18,7 @@ public class Error {
     public static final int CONSTRUCTOR_SPECIFIER = 18;
     public static final int MULTIPLE_CONSTRUCTOR  = 19;
     public static final int MULTIPLE_ASSIGNMENT   = 20;
+    public static final int NOT_FOUND_UNARY       = 21;
     
     public static void message(int code, String text) {
         System.err.println("[" + code + "] Error: " + text);

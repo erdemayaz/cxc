@@ -2,10 +2,11 @@ package rule;
 
 import antlr.CXBaseListener;
 import antlr.CXParser;
-import antlr.CXParser.UnaryExpressionContext;
 import cxc.Error;
 import cxc.Util;
 import java.io.Serializable;
+import java.util.ArrayList;
+import rule.Unary.UnaryVisitor;
 
 /**
  *
@@ -13,6 +14,7 @@ import java.io.Serializable;
  */
 public class Expression extends Rule implements RuleAction, Serializable {
     private Rule parent = null;
+    private ArrayList<Unary> unaries = null;
     
     @Override
     public void analyze() {
@@ -51,28 +53,50 @@ public class Expression extends Rule implements RuleAction, Serializable {
 
         @Override
         public void enterAssignmentExpression(CXParser.AssignmentExpressionContext ctx) {
-            
             if(ctx.assignmentOperator() != null) {
                 if(ctx.assignmentExpression().assignmentOperator() != null) {
-                    // error for ... = ... = ...
                     Error.message(Error.MULTIPLE_ASSIGNMENT, 
                             "Multiple assignment in expression statement", 
                             Util.getRuleLine(source, ctx.assignmentExpression()
                                     .assignmentOperator()));
                 } else if(ctx.assignmentExpression().conditionalExpression() != null) {
-                    
+                    // left single unary
+                    UnaryVisitor uvRight = new UnaryVisitor(source);
+                    uvRight.visit(ctx.assignmentExpression());
+                    if(uvRight.getUnaries().size() == 1) {
+                        uvRight.getUnaries().get(0).setParent(e);
+                        if(e.unaries == null)
+                            e.unaries = new ArrayList<>();
+                        e.unaries.add(uvRight.getUnaries().get(0));
+                    }
+                    // right multiple unaries
+                    UnaryVisitor uvLeft = new UnaryVisitor(source);
+                    uvLeft.visit(ctx.assignmentExpression());
+                    if(uvLeft.getUnaries().size() > 0) {
+                        uvLeft.getUnaries().stream().forEach((u) -> {
+                            u.setParent(e);
+                        });
+                        if(e.unaries == null)
+                            e.unaries = new ArrayList<>();
+                        e.unaries.addAll(uvLeft.getUnaries());
+                    }
                 } else {
                     // digit sequence in right of assignment
                 }
             } else if (ctx.conditionalExpression() != null) {
-                
+                UnaryVisitor uv = new UnaryVisitor(source);
+                uv.visit(ctx.conditionalExpression());
+                if(uv.getUnaries().size() > 0) {
+                    uv.getUnaries().stream().forEach((u) -> {
+                        u.setParent(e);
+                    });
+                    if(e.unaries == null)
+                        e.unaries = new ArrayList<>();
+                    e.unaries.addAll(uv.getUnaries());
+                }
             } else {
                 // digit sequence
             }
-        }
-        
-        private void unaryExpressionAnalysis(UnaryExpressionContext uectx) {
-            
         }
 
         public Expression getExpression() {
