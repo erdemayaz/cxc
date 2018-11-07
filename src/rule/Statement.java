@@ -28,7 +28,8 @@ public class Statement extends Rule implements RuleAction, Serializable {
     @Override
     public void analyze() {
         if(context == ExpressionStatementContext.class) {
-            expressions.stream().forEach((e) -> { e.analyze(); });
+            if(expressions != null)
+                expressions.stream().forEach((e) -> { e.analyze(); });
         }
     }
 

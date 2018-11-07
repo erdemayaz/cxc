@@ -1,11 +1,10 @@
 package rule;
 
-import antlr.CXBaseListener;
 import antlr.CXBaseVisitor;
 import antlr.CXParser;
-import cxc.Util;
 import java.io.Serializable;
 import java.util.ArrayList;
+import rule.Postfix.PostfixVisitor;
 
 /**
  *
@@ -13,6 +12,7 @@ import java.util.ArrayList;
  */
 public class Unary extends Rule implements RuleAction, Serializable {
     private Expression parent = null;
+    private ArrayList<Postfix> postfixes = null;
     
     @Override
     public void analyze() {
@@ -48,7 +48,20 @@ public class Unary extends Rule implements RuleAction, Serializable {
 
         @Override
         public Object visitUnaryExpression(CXParser.UnaryExpressionContext ctx) {
-            
+            if(ctx.postfixExpression() != null) {
+                //System.out.println(Util.getRuleText(source, ctx));
+                PostfixVisitor pv = new PostfixVisitor(source);
+                pv.visit(ctx.postfixExpression());
+                
+            } else if(ctx.unaryExpression() != null) {
+                //super.visitUnaryExpression(ctx);
+            } else if(ctx.unaryOperator() != null) {
+                //super.visit(ctx.castExpression());
+            } else if(ctx.typeName() != null) {
+
+            } else {
+                // '&&' Identifier
+            }
             return super.visitUnaryExpression(ctx);
         }
 
@@ -56,4 +69,6 @@ public class Unary extends Rule implements RuleAction, Serializable {
             return u;
         }
     }
+    
+    
 }

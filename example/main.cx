@@ -7,7 +7,8 @@ int main(int argc, char* argv[]) {
 	Erdem erdem = ErdemVertex();
 	erdem.age = 200, erdem.age = 100 + 20;
 	erdem.point1 = 3000.00, erdem.point2 = 4000.00, erdem.point3 = 5000.00;
-	erdem.hello(102.8).howru("led viri");
+	erdem.hello(102.8).howru("led viri").howru("led viri");
+	++erdem.agea = &(Erdem) erdem.fine(9999);
 	return 0;
 }
 

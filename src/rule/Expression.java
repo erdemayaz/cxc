@@ -22,6 +22,8 @@ public class Expression extends Rule implements RuleAction, Serializable {
             Statement p = (Statement) parent;
             
         }
+        if(unaries != null)
+            unaries.stream().forEach((u) -> { u.analyze(); });
     }
 
     @Override
@@ -62,7 +64,7 @@ public class Expression extends Rule implements RuleAction, Serializable {
                 } else if(ctx.assignmentExpression().conditionalExpression() != null) {
                     // left single unary
                     UnaryVisitor uvRight = new UnaryVisitor(source);
-                    uvRight.visit(ctx.assignmentExpression());
+                    uvRight.visit(ctx.unaryExpression());
                     if(uvRight.getUnaries().size() == 1) {
                         uvRight.getUnaries().get(0).setParent(e);
                         if(e.unaries == null)
