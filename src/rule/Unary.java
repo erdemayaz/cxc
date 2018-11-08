@@ -5,6 +5,7 @@ import antlr.CXParser;
 import cxc.Util;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import rule.Postfix.PostfixVisitor;
 
 /**
@@ -41,6 +42,24 @@ public class Unary extends Rule implements RuleAction, Serializable {
     public ArrayList<Postfix> getPostfixes() {
         return postfixes;
     }
+    
+    public String[] getPostfixStrings() {
+        if(postfixes != null && postfixes.size() > 0) {
+            ArrayList<String> pf = new ArrayList<>();
+            for(int i = 0; i < postfixes.size() - 1; ++i) {
+                System.out.println(postfixes.get(i).getText().substring(postfixes.get(i + 1).getText().length()));
+                pf.add(postfixes.get(i).getText().substring(postfixes.get(i + 1).getText().length()));
+            }
+            pf.add(postfixes.get(postfixes.size() - 1).getText());
+            String[] p = new String[pf.size()];
+            Collections.reverse(pf);
+            p = pf.toArray(p);
+            return p;
+        } else {
+            return null;
+        }
+        
+    }
 
     public void setPostfixes(ArrayList<Postfix> postfixes) {
         if(this.postfixes == null)
@@ -70,6 +89,7 @@ public class Unary extends Rule implements RuleAction, Serializable {
                     });
                     unary.setPostfixes(pv.getPostfixes());
                 }
+                u.add(unary);
             } else if(ctx.unaryExpression() != null) {
                 super.visitUnaryExpression(ctx);
             } else if(ctx.unaryOperator() != null) {

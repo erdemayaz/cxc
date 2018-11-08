@@ -43,6 +43,18 @@ public class Expression extends Rule implements RuleAction, Serializable {
     public void setParent(Rule parent) {
         this.parent = parent;
     }
+
+    public ArrayList<Unary> getUnaries() {
+        return unaries;
+    }
+    
+    public void addUnary(Unary unary) {
+        unaries.add(unary);
+    }
+
+    public void addUnaries(ArrayList<Unary> unary) {
+        unaries.addAll(unary);
+    }
     
     public static class ExpressionListener extends CXBaseListener {
         private final Expression e;
@@ -69,7 +81,7 @@ public class Expression extends Rule implements RuleAction, Serializable {
                         uvRight.getUnaries().get(0).setParent(e);
                         if(e.unaries == null)
                             e.unaries = new ArrayList<>();
-                        e.unaries.add(uvRight.getUnaries().get(0));
+                        e.addUnary(uvRight.getUnaries().get(0));
                     }
                     // right multiple unaries
                     UnaryVisitor uvLeft = new UnaryVisitor(source);
@@ -80,7 +92,7 @@ public class Expression extends Rule implements RuleAction, Serializable {
                         });
                         if(e.unaries == null)
                             e.unaries = new ArrayList<>();
-                        e.unaries.addAll(uvLeft.getUnaries());
+                        e.addUnaries(uvLeft.getUnaries());
                     }
                 } else {
                     // digit sequence in right of assignment
@@ -94,7 +106,7 @@ public class Expression extends Rule implements RuleAction, Serializable {
                     });
                     if(e.unaries == null)
                         e.unaries = new ArrayList<>();
-                    e.unaries.addAll(uv.getUnaries());
+                    e.addUnaries(uv.getUnaries());
                 }
             } else {
                 // digit sequence

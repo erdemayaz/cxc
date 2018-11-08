@@ -1,7 +1,10 @@
 package cxc;
 
+import antlr.CXParser.ExpressionContext;
 import java.util.ArrayList;
+import java.util.Arrays;
 import rule.Declaration;
+import rule.Function;
 
 /**
  *
@@ -65,6 +68,8 @@ public class Analyzer {
     
     private void usageAnalysis() {
         ArrayList<Declaration> decls = new ArrayList<>();
+        ArrayList<String> identifiers = new ArrayList<>();
+        ArrayList<String[]> postfixes = new ArrayList<>();
         if(tree.getDeclarations() != null)
             decls.addAll(tree.getDeclarations());
         
@@ -72,6 +77,7 @@ public class Analyzer {
             tree.getFunctions().stream().forEach((f) -> {
                 if(f.getDeclarations() != null)
                     decls.addAll(f.getDeclarations());
+                setPostfixes(postfixes, f);
             });
         }
         
@@ -84,6 +90,7 @@ public class Analyzer {
                     v.getFunctions().stream().forEach((f) -> {
                         if(f.getDeclarations() != null)
                             decls.addAll(f.getDeclarations());
+                        setPostfixes(postfixes, f);
                     });
                 }
             });
@@ -92,10 +99,40 @@ public class Analyzer {
         tree.getVertexes().stream().forEach((v) -> {
             decls.stream().forEach((d) -> {
                 if(v.getIdentifier().equals(d.getSpecifiers())) {
-                    findUsage(d.getIdentifier());
+                    identifiers.add(d.getIdentifier());
                 }
             });
         });
+        
+        
+    }
+    
+    private void setPostfixes(ArrayList<String[]> p, Function f) {
+        if(f.getStatements() != null) {
+            f.getStatements().stream().forEach((s) -> {
+               if(s.getContext().equals(ExpressionContext.class)) {
+                   s.getExpressions().stream().forEach((e) -> {
+                       if(e.getUnaries() != null) {
+                           e.getUnaries().stream().forEach((u) -> {
+                               if(u.getPostfixes() != null) {
+                                   //p.add(u.getPostfixStrings());
+                                   //System.out.println("----------");
+                                   u.getPostfixes().stream().forEach((pf) -> {
+                                       //System.out.println(pf.getText() + " - " + pf.isUnaryElement());
+                                   });
+                               }
+                           });
+                       } 
+                   });
+               } 
+            });
+        }
+    }
+    
+    private void postfixAnalysis(String[] primaries, ArrayList<String> ids) {
+        for(int i = 0; i < primaries.length; ++i) {
+            
+        }
     }
     
     private void findUsage(String identifier) {

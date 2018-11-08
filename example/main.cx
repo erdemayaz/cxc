@@ -18,6 +18,7 @@ vertex Erdem {
 	public double point1 = 1001.65, point2 = 1351.97, point3;
 	
 	public Erdem() {
+		this.age = 100;
 		printf("Erdem vertex start\n", erdem.hello(1.56, 3,98));
 	}
 	
