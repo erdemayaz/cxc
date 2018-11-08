@@ -1,6 +1,7 @@
 package cxc;
 
 import antlr.CXParser.ExpressionContext;
+import antlr.CXParser.ExpressionStatementContext;
 import java.util.ArrayList;
 import java.util.Arrays;
 import rule.Declaration;
@@ -110,16 +111,13 @@ public class Analyzer {
     private void setPostfixes(ArrayList<String[]> p, Function f) {
         if(f.getStatements() != null) {
             f.getStatements().stream().forEach((s) -> {
-               if(s.getContext().equals(ExpressionContext.class)) {
+               if(s.getContext().equals(ExpressionStatementContext.class)) {
                    s.getExpressions().stream().forEach((e) -> {
                        if(e.getUnaries() != null) {
                            e.getUnaries().stream().forEach((u) -> {
                                if(u.getPostfixes() != null) {
-                                   //p.add(u.getPostfixStrings());
-                                   //System.out.println("----------");
-                                   u.getPostfixes().stream().forEach((pf) -> {
-                                       //System.out.println(pf.getText() + " - " + pf.isUnaryElement());
-                                   });
+                                   p.add(u.getPostfixStrings());
+                                   //System.out.println(Arrays.toString(u.getPostfixStrings()));
                                }
                            });
                        } 

@@ -47,7 +47,6 @@ public class Unary extends Rule implements RuleAction, Serializable {
         if(postfixes != null && postfixes.size() > 0) {
             ArrayList<String> pf = new ArrayList<>();
             for(int i = 0; i < postfixes.size() - 1; ++i) {
-                System.out.println(postfixes.get(i).getText().substring(postfixes.get(i + 1).getText().length()));
                 pf.add(postfixes.get(i).getText().substring(postfixes.get(i + 1).getText().length()));
             }
             pf.add(postfixes.get(postfixes.size() - 1).getText());
@@ -65,6 +64,12 @@ public class Unary extends Rule implements RuleAction, Serializable {
         if(this.postfixes == null)
             this.postfixes = new ArrayList<>();
         this.postfixes = postfixes;
+    }
+    
+    public void addPostfix(Postfix postfix) {
+        if(this.postfixes == null)
+            this.postfixes = new ArrayList<>();
+        this.postfixes.add(postfix);
     }
     
     public static class UnaryVisitor extends CXBaseVisitor {
@@ -90,6 +95,7 @@ public class Unary extends Rule implements RuleAction, Serializable {
                     unary.setPostfixes(pv.getPostfixes());
                 }
                 u.add(unary);
+                return super.visitUnaryExpression(ctx);
             } else if(ctx.unaryExpression() != null) {
                 super.visitUnaryExpression(ctx);
             } else if(ctx.unaryOperator() != null) {
@@ -100,6 +106,7 @@ public class Unary extends Rule implements RuleAction, Serializable {
                 // '&&' Identifier
             }
             return null;
+            //return super.visitUnaryExpression(ctx);
         }
 
         public ArrayList<Unary> getUnaries() {

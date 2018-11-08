@@ -18,12 +18,31 @@ public class Expression extends Rule implements RuleAction, Serializable {
     
     @Override
     public void analyze() {
-        if(parent.getClass() == Statement.class) {
-            Statement p = (Statement) parent;
-            
-        }
-        if(unaries != null)
+        if(unaries != null) {
+            ArrayList<Unary> temps = new ArrayList<>();
+            for(Unary u : unaries) {
+                int level = 1;
+                Unary un = new Unary();
+                un.setParent(u.getParent());
+                un.setText(u.getText());
+                if(u.getPostfixes() != null) {
+                    for(Postfix p : u.getPostfixes()) {
+                        if(p.getLevel() != level) {
+                            level++;
+                            temps.add(un);
+                            un = new Unary();
+                            un.setParent(u.getParent());
+                            un.setText(u.getText());
+                        }
+                        un.addPostfix(p);
+                    }
+                }
+                temps.add(un);
+            }
+            unaries.clear();
+            unaries.addAll(temps);
             unaries.stream().forEach((u) -> { u.analyze(); });
+        }
     }
 
     @Override

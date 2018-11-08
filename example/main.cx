@@ -19,7 +19,7 @@ vertex Erdem {
 	
 	public Erdem() {
 		this.age = 100;
-		printf("Erdem vertex start\n", erdem.hello(1.56, 3,98));
+		printf("Erdem vertex start\n", erdem.hello(1.56, erdem.wow, erdem.name));
 	}
 	
 	void hello(const double y, double t) {

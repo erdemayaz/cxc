@@ -4,7 +4,6 @@ import antlr.CXBaseListener;
 import antlr.CXParser;
 import antlr.CXParser.AssignmentExpressionContext;
 import antlr.CXParser.CompoundStatementContext;
-import antlr.CXParser.ExpressionContext;
 import antlr.CXParser.ExpressionStatementContext;
 import antlr.CXParser.IterationStatementContext;
 import antlr.CXParser.JumpStatementContext;
@@ -81,7 +80,7 @@ public class Statement extends Rule implements RuleAction, Serializable {
             if(ctx != null) {
                 s.setText(Util.getRuleText(source, ctx));
                 if(ctx.expressionStatement() != null) {
-                    s.setContext(ExpressionContext.class);
+                    s.setContext(ExpressionStatementContext.class);
                     if(ctx.expressionStatement().expression() != null) {
                         s.expressions = new ArrayList<>();
                         Util.tree2list(ctx.expressionStatement().expression(), 3)

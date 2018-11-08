@@ -6,6 +6,7 @@ import antlr.CXParser.UnaryExpressionContext;
 import cxc.Util;
 import java.io.Serializable;
 import java.util.ArrayList;
+import rule.Unary.UnaryVisitor;
 
 /**
  *
@@ -15,7 +16,7 @@ public class Postfix extends Rule implements RuleAction, Serializable {
     private Unary parent;
     private int start;
     private int stop;
-    private boolean unaryElement;
+    private int level;
     
     @Override
     public void analyze() {
@@ -56,17 +57,18 @@ public class Postfix extends Rule implements RuleAction, Serializable {
         this.stop = stop;
     }
 
-    public boolean isUnaryElement() {
-        return unaryElement;
+    public int getLevel() {
+        return level;
     }
 
-    public void setUnaryElement(boolean unaryElement) {
-        this.unaryElement = unaryElement;
+    public void setLevel(int level) {
+        this.level = level;
     }
     
     public static class PostfixVisitor extends CXBaseVisitor {
         private final ArrayList<Postfix> p;
         private final String source;
+        private int level = 0;
 
         public PostfixVisitor(String source) {
             this.p = new ArrayList<>();
@@ -76,26 +78,31 @@ public class Postfix extends Rule implements RuleAction, Serializable {
         @Override
         public Object visitPostfixExpression(CXParser.PostfixExpressionContext ctx) {
             if(ctx.getChildCount() == 3 && ctx.getChild(1).toString().equals(".")) {
-                if(ctx.parent.getClass().equals(UnaryExpressionContext.class))
+                if(ctx.parent.getClass().equals(UnaryExpressionContext.class)) {
                     addPostfix(ctx, true);
-                else
+                } else {
                     addPostfix(ctx, false);
+                }
             } else if(ctx.getChildCount() < 5 && ctx.getChildCount() > 2 && 
                     ctx.getChild(1).toString().equals("(")) {
-                if(ctx.parent.getClass().equals(UnaryExpressionContext.class))
+                if(ctx.parent.getClass().equals(UnaryExpressionContext.class)) {
                     addPostfix(ctx, true);
-                else
+                }
+                else {
                     addPostfix(ctx, false);
+                }
             }
             return super.visitPostfixExpression(ctx);
         }
         
         private void addPostfix(CXParser.PostfixExpressionContext ctx, boolean u) {
+            if(u)
+                level++;
             Postfix pf = new Postfix();
             pf.setText(Util.getRuleText(source, ctx));
             pf.setStart(Util.getRuleStart(source, ctx));
             pf.setStop(Util.getRuleStop(source, ctx));
-            pf.setUnaryElement(u);
+            pf.setLevel(level);
             p.add(pf);
             if(ctx.postfixExpression().primaryExpression() != null) {
                 Postfix pr = new Postfix();
@@ -105,6 +112,7 @@ public class Postfix extends Rule implements RuleAction, Serializable {
                         ctx.postfixExpression().primaryExpression()));
                 pr.setStop(Util.getRuleStop(source, 
                         ctx.postfixExpression().primaryExpression()));
+                pr.setLevel(level);
                 p.add(pr);
             }
         }
