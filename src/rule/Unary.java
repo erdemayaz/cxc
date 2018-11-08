@@ -2,6 +2,7 @@ package rule;
 
 import antlr.CXBaseVisitor;
 import antlr.CXParser;
+import cxc.Util;
 import java.io.Serializable;
 import java.util.ArrayList;
 import rule.Postfix.PostfixVisitor;
@@ -36,6 +37,16 @@ public class Unary extends Rule implements RuleAction, Serializable {
     public void setParent(Expression parent) {
         this.parent = parent;
     }
+
+    public ArrayList<Postfix> getPostfixes() {
+        return postfixes;
+    }
+
+    public void setPostfixes(ArrayList<Postfix> postfixes) {
+        if(this.postfixes == null)
+            this.postfixes = new ArrayList<>();
+        this.postfixes = postfixes;
+    }
     
     public static class UnaryVisitor extends CXBaseVisitor {
         private final ArrayList<Unary> u;
@@ -49,20 +60,26 @@ public class Unary extends Rule implements RuleAction, Serializable {
         @Override
         public Object visitUnaryExpression(CXParser.UnaryExpressionContext ctx) {
             if(ctx.postfixExpression() != null) {
-                //System.out.println(Util.getRuleText(source, ctx));
+                Unary unary = new Unary();
+                unary.setText(Util.getRuleText(source, ctx));
                 PostfixVisitor pv = new PostfixVisitor(source);
                 pv.visit(ctx.postfixExpression());
-                
+                if(pv.getPostfixes().size() > 0) {
+                    pv.getPostfixes().stream().forEach((p) -> {
+                        p.setParent(unary);
+                    });
+                    unary.setPostfixes(pv.getPostfixes());
+                }
             } else if(ctx.unaryExpression() != null) {
-                //super.visitUnaryExpression(ctx);
+                super.visitUnaryExpression(ctx);
             } else if(ctx.unaryOperator() != null) {
-                //super.visit(ctx.castExpression());
+                super.visit(ctx.castExpression());
             } else if(ctx.typeName() != null) {
 
             } else {
                 // '&&' Identifier
             }
-            return super.visitUnaryExpression(ctx);
+            return null;
         }
 
         public ArrayList<Unary> getUnaries() {

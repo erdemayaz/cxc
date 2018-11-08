@@ -22,6 +22,14 @@ public class Util {
         return list;
     }
     
+    public static int getRuleStart(String source, ParserRuleContext ctx) {
+        return ctx.start.getStartIndex();
+    }
+    
+    public static int getRuleStop(String source, ParserRuleContext ctx) {
+        return ctx.stop.getStopIndex() + 1;
+    }
+    
     public static String getRuleText(String source, ParserRuleContext ctx) {
         return source.substring(ctx.start.getStartIndex(), ctx.stop.getStopIndex() + 1);
     }

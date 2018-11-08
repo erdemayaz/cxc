@@ -18,7 +18,7 @@ vertex Erdem {
 	public double point1 = 1001.65, point2 = 1351.97, point3;
 	
 	public Erdem() {
-		printf("Erdem vertex start\n");
+		printf("Erdem vertex start\n", erdem.hello(1.56, 3,98));
 	}
 	
 	void hello(const double y, double t) {
