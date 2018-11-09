@@ -74,6 +74,16 @@ public class Function extends Rule implements RuleAction, Serializable {
         
     }
     
+    public Declaration getDeclarationByIdentifier(String identifier) {
+        if(declarations != null) {
+            for(Declaration d : declarations) {
+                if(d.getIdentifier().equals(identifier))
+                    return d;
+            }
+        }
+        return null;
+    }
+    
     private void modifierAnalysis() {
         if(modifier != Modifier.DEFAULT && parent == null) {
             cxc.Error.message(cxc.Error.INCOMPATIBLE_MODIFIER, 

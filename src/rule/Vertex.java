@@ -53,6 +53,26 @@ public class Vertex extends Rule implements RuleAction, Serializable {
         return functions;
     }
     
+    public Declaration getDeclarationByIdentifier(String identifier) {
+        if(declarations != null) {
+            for(Declaration d : declarations) {
+                if(d.getIdentifier().equals(identifier))
+                    return d;
+            }
+        }
+        return null;
+    }
+    
+    public Function getFunctionByIdentifier(String identifier) {
+        if(functions != null) {
+            for(Function f : functions) {
+                if(f.getIdentifier().equals(identifier))
+                    return f;
+            }
+        }
+        return null;
+    }
+    
     private void parameterSpecifiersAnalysis(int bottom, int top) {
         boolean same = true;
         for(int k = 0; k < functions.get(bottom)

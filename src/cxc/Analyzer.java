@@ -1,11 +1,10 @@
 package cxc;
 
-import antlr.CXParser.ExpressionContext;
 import antlr.CXParser.ExpressionStatementContext;
 import java.util.ArrayList;
-import java.util.Arrays;
 import rule.Declaration;
 import rule.Function;
+import rule.Vertex;
 
 /**
  *
@@ -105,7 +104,9 @@ public class Analyzer {
             });
         });
         
-        
+        postfixes.stream().forEach((p) -> {
+            postfixAnalysis(p, identifiers);
+        });
     }
     
     private void setPostfixes(ArrayList<String[]> p, Function f) {
@@ -117,7 +118,6 @@ public class Analyzer {
                            e.getUnaries().stream().forEach((u) -> {
                                if(u.getPostfixes() != null) {
                                    p.add(u.getPostfixStrings());
-                                   //System.out.println(Arrays.toString(u.getPostfixStrings()));
                                }
                            });
                        } 
@@ -128,8 +128,17 @@ public class Analyzer {
     }
     
     private void postfixAnalysis(String[] primaries, ArrayList<String> ids) {
-        for(int i = 0; i < primaries.length; ++i) {
-            
+        if(ids.contains(primaries[0])){
+            primaries[1] = primaries[1].replaceAll("\\s+", "");
+            if(primaries[1].startsWith("\\.")) {
+                
+            } else {
+                // error --> blabla(blabla)
+            }
+        } else if(primaries[0].equals("this")) {
+            // get vertex
+        } else {
+            // checking that include libraries or other sources
         }
     }
     

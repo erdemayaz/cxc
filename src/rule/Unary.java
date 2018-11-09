@@ -95,7 +95,6 @@ public class Unary extends Rule implements RuleAction, Serializable {
                     unary.setPostfixes(pv.getPostfixes());
                 }
                 u.add(unary);
-                return super.visitUnaryExpression(ctx);
             } else if(ctx.unaryExpression() != null) {
                 super.visitUnaryExpression(ctx);
             } else if(ctx.unaryOperator() != null) {

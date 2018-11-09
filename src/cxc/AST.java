@@ -11,9 +11,9 @@ import rule.Vertex;
  * @author Erdem Ayaz
  */
 public class AST implements Serializable {
-    private ArrayList<Declaration> declarations;
-    private ArrayList<Function> functions;
-    private ArrayList<Vertex> vertexes;
+    private ArrayList<Declaration> declarations = null;
+    private ArrayList<Function> functions = null;
+    private ArrayList<Vertex> vertexes = null;
     
     public void addDeclarations(ArrayList<Declaration> declaration) {
         if(declarations == null)
@@ -43,5 +43,35 @@ public class AST implements Serializable {
 
     public ArrayList<Vertex> getVertexes() {
         return vertexes;
+    }
+    
+    public Declaration getDeclarationByIdentifier(String identifier) {
+        if(declarations != null) {
+            for(Declaration d : declarations) {
+                if(d.getIdentifier().equals(identifier))
+                    return d;
+            }
+        }
+        return null;
+    }
+    
+    public Function getFunctionByIdentifier(String identifier) {
+        if(functions != null) {
+            for(Function f : functions) {
+                if(f.getIdentifier().equals(identifier))
+                    return f;
+            }
+        }
+        return null;
+    }
+    
+    public Vertex getVertexByIdentifier(String identifier) {
+        if(vertexes != null) {
+            for(Vertex v : vertexes) {
+                if(v.getIdentifier().equals(identifier))
+                    return v;
+            }
+        }
+        return null;
     }
 }
