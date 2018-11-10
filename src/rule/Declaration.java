@@ -2,7 +2,10 @@ package rule;
 
 import antlr.CXBaseListener;
 import antlr.CXParser;
+import antlr.CXParser.DeclarationContext;
+import antlr.CXParser.DeclaratorContext;
 import antlr.CXParser.InitDeclaratorContext;
+import antlr.CXParser.InitializerContext;
 import cxc.Error;
 import cxc.Modifier;
 import cxc.Util;
@@ -22,6 +25,7 @@ public class Declaration extends Rule implements RuleAction, Serializable {
     private String pointer = null;
     private String specifiers = null;
     private String initValue = null;
+    private int arraySize = 0;
     
     @Override
     public void analyze() {
@@ -102,6 +106,14 @@ public class Declaration extends Rule implements RuleAction, Serializable {
     public void setInitValue(String initValue) {
         this.initValue = initValue;
     }
+
+    public int getArraySize() {
+        return arraySize;
+    }
+
+    public void setArraySize(int arraySize) {
+        this.arraySize = arraySize;
+    }
     
     public static class DeclarationListener extends CXBaseListener {
         private final ArrayList<Declaration> declarations;
@@ -117,24 +129,18 @@ public class Declaration extends Rule implements RuleAction, Serializable {
             if(ctx != null) {
                 if(ctx.declarationSpecifiers() != null) {
                     if(ctx.initDeclaratorList() != null) {
-                        Modifier mody;
-                        if(ctx.modifier() != null) {
-                            if(ctx.modifier().Public() != null)
-                                mody = Modifier.PUBLIC;
-                            else
-                                mody = Modifier.PRIVATE;
-                        } else {
-                            mody = Modifier.DEFAULT;
-                        }
+                        Modifier mody = modifierAnalysis(ctx);
                         String specs = Util.getRuleText(source, ctx.declarationSpecifiers());
-
                         ArrayList<ParseTree> inits = Util.tree2list(ctx.initDeclaratorList(), 3);
                         inits.stream().map((idc) -> {
-                            CXParser.DeclaratorContext dec = (CXParser.DeclaratorContext) idc.getChild(0);
+                            CXParser.DeclaratorContext dec = 
+                                    (CXParser.DeclaratorContext) idc.getChild(0);
                             CXParser.InitializerContext ini = null;
+                            int arraySize = 0;
                             if(idc.getChildCount() == 3) {
                                 ini = (CXParser.InitializerContext) idc.getChild(2);
                             }
+                            arraySize = assignmentControl(dec, ini, arraySize);
                             Declaration d = new Declaration();
                             d.setModifier(mody);
                             d.setSpecifiers(specs);
@@ -144,6 +150,7 @@ public class Declaration extends Rule implements RuleAction, Serializable {
                             if(ini != null) {
                                 d.setInitValue(Util.getRuleText(source, ini));
                             }
+                            d.setArraySize(arraySize);
                             return d;
                         }).forEach((d) -> {
                             declarations.add(d);
@@ -168,6 +175,60 @@ public class Declaration extends Rule implements RuleAction, Serializable {
             }
         }
 
+        private Modifier modifierAnalysis(DeclarationContext ctx) {
+            Modifier mody;
+            if(ctx.modifier() != null) {
+                if(ctx.modifier().Public() != null)
+                    mody = Modifier.PUBLIC;
+                else
+                    mody = Modifier.PRIVATE;
+            } else {
+                mody = Modifier.DEFAULT;
+            }
+            return mody;
+        }
+        
+        private int listCount(ParseTree tree, int minElementNumber) {
+            int counter = 1;
+            while(tree.getChildCount() >= minElementNumber) {
+                tree = tree.getChild(0);
+                counter++;
+            }
+            return counter++;
+        }
+        
+        private int assignmentControl(DeclaratorContext dec, InitializerContext ini, int arraySize) {
+            if(dec.directDeclarator().Identifier() != null) {
+                //single variable
+            } else if(dec.directDeclarator().directDeclarator() != null 
+                    && dec.directDeclarator().getChild(1).getText().equals("[")) {
+                if(dec.directDeclarator().assignmentExpression() == null) {
+                    // identifier[]
+                    if(ini != null && ini.initializerList() != null) {
+                        arraySize = listCount(ini.initializerList(), 3);
+                    } else {
+                        Error.message(Error.NO_INITIALIZER_LIST, 
+                                "There is no initializer list", 
+                                Util.getRuleLine(source, dec));
+                    }
+                } else {
+                    // identifier[expression]
+                    if(ini != null) {
+                        Error.message(Error.HAS_INITIALIZER, 
+                                "There is initializer", 
+                                Util.getRuleLine(source, dec));
+                    }
+                }
+            } else if(dec.directDeclarator().directDeclarator() != null 
+                    && dec.directDeclarator().getChild(1).getText().equals("(")) {
+                // identifier(identifier list)
+                Error.message(Error.INCORRECT_ASSIGNMENT, 
+                                "Function cannot be assigned anything", 
+                                Util.getRuleLine(source, dec));
+            }
+            return arraySize;
+        }
+        
         public ArrayList<Declaration> getDeclarations() {
             return declarations;
         }

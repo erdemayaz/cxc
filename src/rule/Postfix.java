@@ -91,6 +91,14 @@ public class Postfix extends Rule implements RuleAction, Serializable {
                 else {
                     addPostfix(ctx, false);
                 }
+            } else if(ctx.getChildCount() < 5 && ctx.getChildCount() > 2 && 
+                    ctx.getChild(1).toString().equals("[")) {
+                if(ctx.parent.getClass().equals(UnaryExpressionContext.class)) {
+                    addPostfix(ctx, true);
+                }
+                else {
+                    addPostfix(ctx, false);
+                }
             }
             return super.visitPostfixExpression(ctx);
         }

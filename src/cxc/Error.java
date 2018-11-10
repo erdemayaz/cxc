@@ -19,6 +19,11 @@ public class Error {
     public static final int MULTIPLE_CONSTRUCTOR  = 19;
     public static final int MULTIPLE_ASSIGNMENT   = 20;
     public static final int NOT_FOUND_UNARY       = 21;
+    public static final int MEMBER_START_ERROR    = 22;
+    public static final int NO_MAIN               = 23;
+    public static final int NO_INITIALIZER_LIST   = 24;
+    public static final int HAS_INITIALIZER       = 25;
+    public static final int INCORRECT_ASSIGNMENT  = 26;
     
     public static void message(int code, String text) {
         System.err.println("[" + code + "] Error: " + text);

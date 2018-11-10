@@ -2,6 +2,7 @@ package cxc;
 
 import antlr.CXParser.ExpressionStatementContext;
 import java.util.ArrayList;
+import java.util.Arrays;
 import rule.Declaration;
 import rule.Function;
 import rule.Vertex;
@@ -46,6 +47,13 @@ public class Analyzer {
                     Error.message(Error.MULTIPLE_IDENTIFIER, 
                             "Multiple function identifier '" + 
                                     f.getIdentifier() + "'");
+                }
+                int i = 0;
+                i = functionNames.stream().filter((fn) -> (fn.equals("main")))
+                        .map((item) -> 1).reduce(i, Integer::sum);
+                if(i != 1) {
+                    Error.message(Error.NO_MAIN, 
+                            "There is no main function");
                 }
                 f.analyze();
             });
@@ -130,19 +138,43 @@ public class Analyzer {
     private void postfixAnalysis(String[] primaries, ArrayList<String> ids) {
         if(ids.contains(primaries[0])){
             primaries[1] = primaries[1].replaceAll("\\s+", "");
-            if(primaries[1].startsWith("\\.")) {
-                
-            } else {
+            if(primaries[1].startsWith(".")) {
+                //vertexMemberAnalysis(primaries);
+            } else if(primaries[1].startsWith("(")) {
                 // error --> blabla(blabla)
+                Error.message(Error.MEMBER_START_ERROR, 
+                        "Vertex member does not include dot annotation('" + 
+                                primaries[0] + primaries[1] + "')");
+            } else { // starts with '['
+                
             }
         } else if(primaries[0].equals("this")) {
-            // get vertex
+            primaries[1] = primaries[1].replaceAll("\\s+", "");
+            if(primaries[1].startsWith(".")) {
+                //System.out.println(Arrays.toString(primaries));
+            } else if(primaries[1].startsWith("(")){
+                //System.out.println(Arrays.toString(primaries));
+            } else { // starts with '['
+                Error.message(Error.MEMBER_START_ERROR, 
+                        "Vertex member does not include dot annotation('" + 
+                                primaries[0] + primaries[1] + "')");
+            }
         } else {
+            // it may be struct or union or
             // checking that include libraries or other sources
         }
     }
     
-    private void findUsage(String identifier) {
-        // find all expression statements that includes the identifier
+    private void vertexMemberAnalysis(String[] primaries) {
+        System.out.println("From member analysis " + Arrays.toString(primaries));
+        Vertex v = tree.getVertexByIdentifier(primaries[0]);
+        int pLen = primaries.length;
+        for(int i = 1; i < pLen; ++i) {
+            if(i == pLen - 1) { // last notation
+                Declaration d = v.getDeclarationByIdentifier(primaries[i]);
+            } else {
+                
+            }
+        }
     }
 }

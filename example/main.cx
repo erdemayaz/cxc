@@ -4,11 +4,15 @@ double scores[10];
 
 int main(int argc, char* argv[]) {
 	printf("Hello CX!");
-	Erdem erdem = ErdemVertex();
+	Erdem erdem = Erdem();
+	Erdem myVertexes[10];
+	Erdem myInits[] = {Erdem(), Erdem(), Erdem()};
+	myVertexes[5] = Erdem();
 	erdem.age = 200, erdem.age = 100 + 20;
 	erdem.point1 = 3000.00, erdem.point2 = 4000.00, erdem.point3 = 5000.00;
-	erdem.hello(102.8).howru("led viri").howru("led viri");
+	erdem.hello(102.8).howru("led viri").ayaz[50].howru("led viri");
 	++erdem.agea = &(Erdem) erdem.fine(9999);
+	erdem[20].ayaz();
 	return 0;
 }
 
@@ -19,6 +23,7 @@ vertex Erdem {
 	
 	public Erdem() {
 		this.age = 100;
+		this(1000);
 		printf("Erdem vertex start\n", erdem.hello(1.56, erdem.wow, erdem.name));
 	}
 	
