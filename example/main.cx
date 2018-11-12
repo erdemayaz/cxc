@@ -23,7 +23,6 @@ vertex Erdem {
 	
 	public Erdem() {
 		this.age = 100;
-		this(1000);
 		printf("Erdem vertex start\n", erdem.hello(1.56, erdem.wow, erdem.name));
 	}
 	

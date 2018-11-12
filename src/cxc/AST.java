@@ -74,4 +74,34 @@ public class AST implements Serializable {
         }
         return null;
     }
+    
+    public Declaration getDeclarationByIdentifierAll(String identifier) {
+        if(declarations != null) {
+            for(Declaration d : declarations) {
+                if(d.getIdentifier().equals(identifier))
+                    return d;
+            }
+        }
+        return null;
+    }
+    
+    public Function getFunctionByIdentifierAll(String identifier) {
+        if(functions != null) {
+            for(Function f : functions) {
+                if(f.getIdentifier().equals(identifier))
+                    return f;
+            }
+        }
+        if(vertexes != null) {
+            for(Vertex v : vertexes) {
+                if(v.getFunctions() != null) {
+                    for(Function f : v.getFunctions()) {
+                        if(f.getIdentifier().equals(identifier))
+                            return f;
+                    }
+                }
+            }
+        }
+        return null;
+    }
 }

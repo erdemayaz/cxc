@@ -76,8 +76,9 @@ public class Analyzer {
     
     private void usageAnalysis() {
         ArrayList<Declaration> decls = new ArrayList<>();
-        ArrayList<String> identifiers = new ArrayList<>();
+        ArrayList<Declaration> vertexDecls = new ArrayList<>();
         ArrayList<String[]> postfixes = new ArrayList<>();
+        
         if(tree.getDeclarations() != null)
             decls.addAll(tree.getDeclarations());
         
@@ -107,13 +108,14 @@ public class Analyzer {
         tree.getVertexes().stream().forEach((v) -> {
             decls.stream().forEach((d) -> {
                 if(v.getIdentifier().equals(d.getSpecifiers())) {
-                    identifiers.add(d.getIdentifier());
+                    vertexDecls.add(d);
                 }
             });
         });
         
         postfixes.stream().forEach((p) -> {
-            postfixAnalysis(p, identifiers);
+            //System.out.println(Arrays.toString(p));
+            postfixAnalysis(p, vertexDecls, decls);
         });
     }
     
@@ -135,15 +137,23 @@ public class Analyzer {
         }
     }
     
-    private void postfixAnalysis(String[] primaries, ArrayList<String> ids) {
-        if(ids.contains(primaries[0])){
+    private void postfixAnalysis(String[] primaries, ArrayList<Declaration> vd, 
+            ArrayList<Declaration> decls) {
+        Declaration declaration = null;
+        for(Declaration d : vd) {
+            if(d.getIdentifier().equals(primaries[0])) {
+                declaration = d;
+                break;
+            }
+        }
+        if(declaration != null){
             primaries[1] = primaries[1].replaceAll("\\s+", "");
             if(primaries[1].startsWith(".")) {
-                //vertexMemberAnalysis(primaries);
+                vertexMemberAnalysis(primaries, declaration);
             } else if(primaries[1].startsWith("(")) {
                 // error --> blabla(blabla)
                 Error.message(Error.MEMBER_START_ERROR, 
-                        "Vertex member does not include dot annotation('" + 
+                        "Vertex member does not include parenthesis annotation('" + 
                                 primaries[0] + primaries[1] + "')");
             } else { // starts with '['
                 
@@ -153,10 +163,12 @@ public class Analyzer {
             if(primaries[1].startsWith(".")) {
                 //System.out.println(Arrays.toString(primaries));
             } else if(primaries[1].startsWith("(")){
-                //System.out.println(Arrays.toString(primaries));
+                Error.message(Error.MEMBER_START_ERROR, 
+                        "Vertex member does not include parenthesis annotation('" + 
+                                primaries[0] + primaries[1] + "')");
             } else { // starts with '['
                 Error.message(Error.MEMBER_START_ERROR, 
-                        "Vertex member does not include dot annotation('" + 
+                        "Vertex member does not include bracket annotation('" + 
                                 primaries[0] + primaries[1] + "')");
             }
         } else {
@@ -165,16 +177,20 @@ public class Analyzer {
         }
     }
     
-    private void vertexMemberAnalysis(String[] primaries) {
-        System.out.println("From member analysis " + Arrays.toString(primaries));
-        Vertex v = tree.getVertexByIdentifier(primaries[0]);
+    private void vertexMemberAnalysis(String[] primaries, Declaration declaration) {
+        Vertex v = tree.getVertexByIdentifier(declaration.getSpecifiers());
         int pLen = primaries.length;
         for(int i = 1; i < pLen; ++i) {
-            if(i == pLen - 1) { // last notation
-                Declaration d = v.getDeclarationByIdentifier(primaries[i]);
+            boolean isFunction;
+            if(i != pLen - 1) { // not last notation
+                isFunction = primaries[i + 1].trim().startsWith("(");
+                System.out.println(Arrays.toString(primaries));
+                i++;
             } else {
-                
+                isFunction = false;
             }
+            
+            
         }
     }
 }
