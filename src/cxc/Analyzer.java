@@ -149,7 +149,8 @@ public class Analyzer {
         if(declaration != null){
             primaries[1] = primaries[1].replaceAll("\\s+", "");
             if(primaries[1].startsWith(".")) {
-                vertexMemberAnalysis(primaries, declaration);
+                vertexMemberAnalysis(primaries, tree
+                        .getVertexByIdentifier(declaration.getSpecifiers()));
             } else if(primaries[1].startsWith("(")) {
                 // error --> blabla(blabla)
                 Error.message(Error.MEMBER_START_ERROR, 
@@ -177,8 +178,8 @@ public class Analyzer {
         }
     }
     
-    private void vertexMemberAnalysis(String[] primaries, Declaration declaration) {
-        Vertex v = tree.getVertexByIdentifier(declaration.getSpecifiers());
+    private void vertexMemberAnalysis(String[] primaries, Vertex vertex) {
+        Vertex v = vertex;
         int pLen = primaries.length;
         for(int i = 1; i < pLen; ++i) {
             boolean isFunction;
@@ -189,8 +190,12 @@ public class Analyzer {
             } else {
                 isFunction = false;
             }
-            
-            
+            if(isFunction) {
+                Function f = v.getFunctionByIdentifier(primaries[i - 1]);
+                
+            } else {
+                
+            }
         }
     }
 }
