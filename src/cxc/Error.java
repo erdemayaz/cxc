@@ -24,6 +24,8 @@ public class Error {
     public static final int NO_INITIALIZER_LIST   = 24;
     public static final int HAS_INITIALIZER       = 25;
     public static final int INCORRECT_ASSIGNMENT  = 26;
+    public static final int NO_TYPE               = 27;
+    public static final int NO_SPECIFIER          = 28;
     
     public static void message(int code, String text) {
         System.err.println("[" + code + "] Error: " + text);

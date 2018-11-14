@@ -4,14 +4,15 @@ import antlr.CXBaseListener;
 import antlr.CXParser;
 import antlr.CXParser.DeclarationContext;
 import antlr.CXParser.DeclaratorContext;
-import antlr.CXParser.InitDeclaratorContext;
 import antlr.CXParser.InitializerContext;
+import antlr.CXParser.TypeSpecifierContext;
 import cxc.Error;
 import cxc.Modifier;
 import cxc.Util;
 import java.io.Serializable;
 import java.util.ArrayList;
 import org.antlr.v4.runtime.tree.ParseTree;
+import rule.Specifier.SpecifierListener;
 
 /**
  *
@@ -23,13 +24,14 @@ public class Declaration extends Rule implements RuleAction, Serializable {
     private String identifier = null;
     private String text = null;
     private String pointer = null;
-    private String specifiers = null;
+    private ArrayList<Specifier> specifiers = null;
     private String initValue = null;
     private int arraySize = 0;
     
     @Override
     public void analyze() {
         modifierAnalysis();
+        typeSpecifierControl();
     }
 
     @Override
@@ -42,12 +44,30 @@ public class Declaration extends Rule implements RuleAction, Serializable {
         
     }
     
+    public Specifier getTypeSpecifier() {
+        if(specifiers != null) {
+            for(Specifier s : specifiers) {
+                if(s.getContext().equals(TypeSpecifierContext.class)) {
+                    return s;
+                }
+            }
+        }
+        return null;
+    }
+    
     private void modifierAnalysis() {
         if(modifier != Modifier.DEFAULT && 
                 (parent == null || parent.getClass() == Function.class)) {
             Error.message(Error.INCOMPATIBLE_MODIFIER, 
                     "Usage of modifier is incompatible for declaration '" + 
                             identifier + "'");
+        }
+    }
+    
+    private void typeSpecifierControl() {
+        if(getTypeSpecifier() == null) {
+            Error.message(Error.NO_TYPE, "Declaration has not type specifier ('" 
+                    + identifier + "')");
         }
     }
 
@@ -91,11 +111,11 @@ public class Declaration extends Rule implements RuleAction, Serializable {
         this.pointer = pointer;
     }
 
-    public String getSpecifiers() {
+    public ArrayList<Specifier> getSpecifiers() {
         return specifiers;
     }
 
-    public void setSpecifiers(String specifiers) {
+    public void setSpecifiers(ArrayList<Specifier> specifiers) {
         this.specifiers = specifiers;
     }
 
@@ -130,7 +150,8 @@ public class Declaration extends Rule implements RuleAction, Serializable {
                 if(ctx.declarationSpecifiers() != null) {
                     if(ctx.initDeclaratorList() != null) {
                         Modifier mody = modifierAnalysis(ctx);
-                        String specs = Util.getRuleText(source, ctx.declarationSpecifiers());
+                        SpecifierListener sl = new SpecifierListener(source);
+                        ctx.declarationSpecifiers().enterRule(sl);
                         ArrayList<ParseTree> inits = Util.tree2list(ctx.initDeclaratorList(), 3);
                         inits.stream().map((idc) -> {
                             CXParser.DeclaratorContext dec = 
@@ -143,10 +164,11 @@ public class Declaration extends Rule implements RuleAction, Serializable {
                             arraySize = assignmentControl(dec, ini, arraySize);
                             Declaration d = new Declaration();
                             d.setModifier(mody);
-                            d.setSpecifiers(specs);
+                            d.setSpecifiers((ArrayList<Specifier>) sl.getSpecifiers().clone());
+                            d.getSpecifiers().stream().forEach((spec) -> {
+                                spec.setParent(d);
+                            });
                             d.setIdentifier(Util.getRuleText(source, dec));
-                            InitDeclaratorContext idctx = (InitDeclaratorContext) idc;
-                            d.setText(specs + " " + Util.getRuleText(source, idctx) + ";");
                             if(ini != null) {
                                 d.setInitValue(Util.getRuleText(source, ini));
                             }
@@ -158,10 +180,14 @@ public class Declaration extends Rule implements RuleAction, Serializable {
 
                     } else {
                         // prototype
-                        String specs = Util.getRuleText(source, ctx.declarationSpecifiers());
+                        SpecifierListener sl = new SpecifierListener(source);
+                        ctx.declarationSpecifiers().enterRule(sl);
                         String dText = Util.getRuleText(source, ctx);
                         Declaration d = new Declaration();
-                        d.setSpecifiers(specs);
+                        d.setSpecifiers((ArrayList<Specifier>) sl.getSpecifiers().clone());
+                        d.getSpecifiers().stream().forEach((spec) -> {
+                            spec.setParent(d);
+                        });
                         d.setText(dText);
                         declarations.add(d);
                     }

@@ -107,7 +107,7 @@ public class Analyzer {
         
         tree.getVertexes().stream().forEach((v) -> {
             decls.stream().forEach((d) -> {
-                if(v.getIdentifier().equals(d.getSpecifiers())) {
+                if(v.getIdentifier().equals(d.getTypeSpecifier().getText())) {
                     vertexDecls.add(d);
                 }
             });
@@ -150,7 +150,7 @@ public class Analyzer {
             primaries[1] = primaries[1].replaceAll("\\s+", "");
             if(primaries[1].startsWith(".")) {
                 vertexMemberAnalysis(primaries, tree
-                        .getVertexByIdentifier(declaration.getSpecifiers()));
+                        .getVertexByIdentifier(declaration.getTypeSpecifier().getText()));
             } else if(primaries[1].startsWith("(")) {
                 // error --> blabla(blabla)
                 Error.message(Error.MEMBER_START_ERROR, 
@@ -179,13 +179,13 @@ public class Analyzer {
     }
     
     private void vertexMemberAnalysis(String[] primaries, Vertex vertex) {
+        System.out.println(Arrays.toString(primaries));
         Vertex v = vertex;
         int pLen = primaries.length;
         for(int i = 1; i < pLen; ++i) {
             boolean isFunction;
             if(i != pLen - 1) { // not last notation
                 isFunction = primaries[i + 1].trim().startsWith("(");
-                System.out.println(Arrays.toString(primaries));
                 i++;
             } else {
                 isFunction = false;

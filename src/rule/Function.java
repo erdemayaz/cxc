@@ -6,6 +6,8 @@ import antlr.CXParser.DeclarationSpecifierContext;
 import antlr.CXParser.DirectDeclaratorContext;
 import antlr.CXParser.FunctionDefinitionContext;
 import antlr.CXParser.ParameterDeclarationContext;
+import antlr.CXParser.VertexDefinitionContext;
+import cxc.Error;
 import cxc.Modifier;
 import cxc.Util;
 import java.io.Serializable;
@@ -13,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.antlr.v4.runtime.tree.ParseTree;
 import rule.Declaration.DeclarationListener;
+import rule.Specifier.SpecifierListener;
 import rule.Statement.StatementListener;
 
 /**
@@ -20,7 +23,7 @@ import rule.Statement.StatementListener;
  * @author Erdem Ayaz
  */
 public class Function extends Rule implements RuleAction, Serializable {
-    private String identifier;
+    private String identifier = null;
     private int identifierStart;
     private int identifierStop;
     private int functionStart;
@@ -30,7 +33,7 @@ public class Function extends Rule implements RuleAction, Serializable {
     private Vertex parent = null;
     private ArrayList<Declaration> declarations = null;
     private ArrayList<Statement> statements = null;
-    private final ArrayList<String> specifiers;
+    private final ArrayList<Specifier> specifiers;
     private final ArrayList<ArrayList<String>> parameterSpecifiers;
 
     public Function() {
@@ -40,10 +43,30 @@ public class Function extends Rule implements RuleAction, Serializable {
     
     @Override
     public void analyze() {
-        // modifier control
         modifierAnalysis();
+        declarationAnalysis();
+        statementAnalysis();
+    }
+
+    @Override
+    public void coding() {
         
-        // declarations analysis
+    }
+
+    @Override
+    public void assemble() {
+        
+    }
+    
+    private void modifierAnalysis() {
+        if(modifier != Modifier.DEFAULT && parent == null) {
+            cxc.Error.message(cxc.Error.INCOMPATIBLE_MODIFIER, 
+                    "Usage of modifier is incompatible for function '" 
+                            + identifier + "'");
+        }
+    }
+    
+    private void declarationAnalysis() {
         if(declarations != null) {
             ArrayList<String> declarationNames = new ArrayList<>();
             declarations.stream().forEach((d) -> {
@@ -57,21 +80,12 @@ public class Function extends Rule implements RuleAction, Serializable {
                 d.analyze(); 
             });
         }
-        
-        // statements analysis
+    }
+    
+    private void statementAnalysis() {
         if(statements != null) {
             statements.stream().forEach((s) -> { s.analyze(); });
         }
-    }
-
-    @Override
-    public void coding() {
-        
-    }
-
-    @Override
-    public void assemble() {
-        
     }
     
     public Declaration getDeclarationByIdentifier(String identifier) {
@@ -84,14 +98,6 @@ public class Function extends Rule implements RuleAction, Serializable {
         return null;
     }
     
-    private void modifierAnalysis() {
-        if(modifier != Modifier.DEFAULT && parent == null) {
-            cxc.Error.message(cxc.Error.INCOMPATIBLE_MODIFIER, 
-                    "Usage of modifier is incompatible for function '" 
-                            + identifier + "'");
-        }
-    }
-
     public String getIdentifier() {
         return identifier;
     }
@@ -152,16 +158,16 @@ public class Function extends Rule implements RuleAction, Serializable {
         return parent;
     }
 
-    public ArrayList<String> getSpecifiers() {
+    public ArrayList<Specifier> getSpecifiers() {
         return specifiers;
+    }
+    
+    public void addSpecifiers(ArrayList<Specifier> specifiers) {
+        this.specifiers.addAll(specifiers);
     }
 
     public void setParent(Vertex parent) {
         this.parent = parent;
-    }
-    
-    public void addSpecifier(String specifier) {
-        specifiers.add(specifier);
     }
     
     public void addParameterSpecifiers(ArrayList<String> specifiers) {
@@ -225,17 +231,6 @@ public class Function extends Rule implements RuleAction, Serializable {
                     f.setModifier(Modifier.DEFAULT);
                 }
                 
-                // function specs
-                if(ctx.declarationSpecifiers() != null) {
-                    List<DeclarationSpecifierContext> dsctx 
-                            = ctx.declarationSpecifiers().declarationSpecifier();
-                    dsctx.stream().forEach((dsctx2) -> {
-                        f.addSpecifier(Util.getRuleText(source, dsctx2));
-                    });
-                } else {
-                    // error
-                }
-
                 // pointers
                 if(ctx.declarator().pointer() != null) {
                     f.setPointer(Util.getRuleText(source, ctx.declarator().pointer()));
@@ -288,6 +283,28 @@ public class Function extends Rule implements RuleAction, Serializable {
                     }
                 } else {
                     // error for function form
+                }
+                
+                // function specs
+                if(ctx.declarationSpecifiers() != null) {
+                    SpecifierListener sl = new SpecifierListener(source);
+                    ctx.declarationSpecifiers().enterRule(sl);
+                    
+                    f.addSpecifiers(sl.getSpecifiers());
+                } else {
+                    if(f.getIdentifier() != null) {
+                        if(ctx.parent.getClass().equals(VertexDefinitionContext.class)) {
+                            VertexDefinitionContext vdctx = 
+                                    (VertexDefinitionContext) ctx.parent;
+                            if(!f.getIdentifier().equals(vdctx.Identifier().getText())) {
+                                Error.message(Error.NO_SPECIFIER, "Function has not specifier", 
+                                        Util.getRuleLine(source, ctx));
+                            }
+                        } else {
+                            Error.message(Error.NO_SPECIFIER, "Function has not specifier", 
+                                        Util.getRuleLine(source, ctx));
+                        }
+                    }
                 }
 
                 if(ctx.compoundStatement().blockItemList() != null) {
