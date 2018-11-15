@@ -179,22 +179,45 @@ public class Analyzer {
     }
     
     private void vertexMemberAnalysis(String[] primaries, Vertex vertex) {
-        System.out.println(Arrays.toString(primaries));
         Vertex v = vertex;
         int pLen = primaries.length;
         for(int i = 1; i < pLen; ++i) {
-            boolean isFunction;
+            boolean isFunction = false;
             if(i != pLen - 1) { // not last notation
                 isFunction = primaries[i + 1].trim().startsWith("(");
-                i++;
-            } else {
-                isFunction = false;
             }
-            if(isFunction) {
-                Function f = v.getFunctionByIdentifier(primaries[i - 1]);
-                
+            if(v != null) {
+                if(isFunction) {
+                    Function f = v.getFunctionByIdentifier(primaries[i].substring(1));
+                    if(f != null) {
+                        v = tree.getVertexByIdentifier(f.getTypeSpecifier().getText());
+                        if(v == null && f.getTypeSpecifier().isTypedef()) {
+                            Error.message(Error.NO_VERTEX, "Vertex of member '" + 
+                                    primaries[i].substring(1) +"' not found");
+                        }
+                    } else {
+                        Error.message(Error.NO_FUNCTION, "Vertex " + v.getIdentifier() 
+                                + " has not this function ('" + primaries[i]
+                                        .substring(1) + "')");
+                    }
+                    i++;
+                } else {
+                    Declaration d = v.getDeclarationByIdentifier(primaries[i].substring(1));
+                    if(d != null) {
+                        v = tree.getVertexByIdentifier(d.getTypeSpecifier().getText());
+                        if(v == null && d.getTypeSpecifier().isTypedef()) {
+                            Error.message(Error.NO_VERTEX, "Vertex of member '" + 
+                                    primaries[i].substring(1) +"' not found");
+                        }
+                    } else {
+                        Error.message(Error.NO_DECLARATION, "Vertex " + v.getIdentifier() 
+                                + " has not this declaration ('" + primaries[i]
+                                        .substring(1) + "')");
+                    }
+                }
             } else {
-                
+                Error.message(Error.NO_VERTEX, "Vertex of member '" + 
+                                    primaries[i] +"' not found");
             }
         }
     }

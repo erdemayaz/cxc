@@ -1,11 +1,13 @@
 package rule;
 
 import antlr.CXBaseListener;
+import antlr.CXParser;
 import antlr.CXParser.BlockItemContext;
 import antlr.CXParser.DeclarationSpecifierContext;
 import antlr.CXParser.DirectDeclaratorContext;
 import antlr.CXParser.FunctionDefinitionContext;
 import antlr.CXParser.ParameterDeclarationContext;
+import antlr.CXParser.TypeSpecifierContext;
 import antlr.CXParser.VertexDefinitionContext;
 import cxc.Error;
 import cxc.Modifier;
@@ -93,6 +95,17 @@ public class Function extends Rule implements RuleAction, Serializable {
             for(Declaration d : declarations) {
                 if(d.getIdentifier().equals(identifier))
                     return d;
+            }
+        }
+        return null;
+    }
+    
+    public Specifier getTypeSpecifier() {
+        if(specifiers != null) {
+            for(Specifier s : specifiers) {
+                if(s.getContext().equals(TypeSpecifierContext.class)) {
+                    return s;
+                }
             }
         }
         return null;

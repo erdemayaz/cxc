@@ -26,6 +26,9 @@ public class Error {
     public static final int INCORRECT_ASSIGNMENT  = 26;
     public static final int NO_TYPE               = 27;
     public static final int NO_SPECIFIER          = 28;
+    public static final int NO_FUNCTION           = 29;
+    public static final int NO_DECLARATION        = 30;
+    public static final int NO_VERTEX             = 31;
     
     public static void message(int code, String text) {
         System.err.println("[" + code + "] Error: " + text);

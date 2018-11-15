@@ -18,6 +18,7 @@ import java.util.ArrayList;
 public class Specifier extends Rule implements RuleAction, Serializable {
     private Rule parent = null;
     private Class context = null;
+    private boolean typedef = false;
     
     @Override
     public void analyze() {
@@ -49,6 +50,14 @@ public class Specifier extends Rule implements RuleAction, Serializable {
     public void setContext(Class context) {
         this.context = context;
     }
+
+    public boolean isTypedef() {
+        return typedef;
+    }
+
+    public void setTypedef(boolean typedef) {
+        this.typedef = typedef;
+    }
     
     public static class SpecifierListener extends CXBaseListener {
         private final ArrayList<Specifier> s;
@@ -68,6 +77,9 @@ public class Specifier extends Rule implements RuleAction, Serializable {
                     spec.setContext(StorageClassSpecifierContext.class);
                 } else if(dsctx.typeSpecifier() != null) {
                     spec.setContext(TypeSpecifierContext.class);
+                    if(dsctx.typeSpecifier().typedefName() != null) {
+                        spec.setTypedef(true);
+                    }
                 } else if(dsctx.typeQualifier() != null) {
                     spec.setContext(TypeQualifierContext.class);
                 } else if(dsctx.functionSpecifier() != null) {
