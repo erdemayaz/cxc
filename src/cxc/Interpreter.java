@@ -28,7 +28,7 @@ public class Interpreter extends Thread {
             this.sourceName = sourceName;
         } else {
             this.sourceName = null;
-            Error.message(Error.UNAVAIBLE_EXTENSION, 
+            Error.message(Exception.Error.UNAVAIBLE_EXTENSION, 
                     "File extension is not avaible. It must be 'cx'");
         }
         viewTree = false;
@@ -40,11 +40,12 @@ public class Interpreter extends Thread {
         try {
             source = new String(Files.readAllBytes(Paths.get(sourceName)));
         } catch (IOException ex) {
-            Error.message(Error.READING_EXCEPTION, "Source file cannot read");
+            Error.message(Exception.Error.READING_EXCEPTION, 
+                    "Source file cannot read");
         }
         
         if(source == null) {
-            Error.message(Error.EMPTY_SOURCE, "Source file empty");
+            Error.message(Exception.Error.EMPTY_SOURCE, "Source file empty");
         } else {
             sourceString = source;
         }
@@ -56,7 +57,7 @@ public class Interpreter extends Thread {
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         parser = new CXParser(tokens);
         if(parser == null) {
-            Error.message(Error.PARSER_ERROR, "Parser error");
+            Error.message(Exception.Error.PARSER_ERROR, "Parser error");
         }
     }
     
@@ -69,6 +70,7 @@ public class Interpreter extends Thread {
     private void analyze() {
         Analyzer a = new Analyzer(tree);
         a.analyze();
+        a.getWarnings().stream().forEach((w) -> { Warning.message(w); });
     }
     
     private void coding() {

@@ -21,7 +21,7 @@ public class CXC {
             }
             ex.shutdown();
         } else {
-            Error.message(Error.NEED_PARAMETER, "Need parameter");
+            Error.message(Exception.Error.NEED_PARAMETER, "Need parameter");
         }
     }
     

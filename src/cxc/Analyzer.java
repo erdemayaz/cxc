@@ -13,14 +13,20 @@ import rule.Vertex;
  */
 public class Analyzer {
     private final AST tree;
+    private final ArrayList<Warning> warnings;
 
     public Analyzer(AST tree) {
         this.tree = tree;
+        this.warnings = new ArrayList<>();
     }
     
     public void analyze() {
         ruleAnalysis();
         usageAnalysis();
+    }
+
+    public ArrayList<Warning> getWarnings() {
+        return warnings;
     }
     
     private void ruleAnalysis() {
@@ -30,7 +36,7 @@ public class Analyzer {
                 if(!declarationNames.contains(d.getIdentifier())) {
                     declarationNames.add(d.getIdentifier());
                 } else {
-                    Error.message(Error.MULTIPLE_IDENTIFIER, 
+                    Error.message(Exception.Error.MULTIPLE_IDENTIFIER, 
                             "Multiple declaration identifier '" + 
                                     d.getIdentifier() + "'");
                 }
@@ -44,7 +50,7 @@ public class Analyzer {
                 if(!functionNames.contains(f.getIdentifier())) {
                     functionNames.add(f.getIdentifier());
                 } else {
-                    Error.message(Error.MULTIPLE_IDENTIFIER, 
+                    Error.message(Exception.Error.MULTIPLE_IDENTIFIER, 
                             "Multiple function identifier '" + 
                                     f.getIdentifier() + "'");
                 }
@@ -52,7 +58,7 @@ public class Analyzer {
                 i = functionNames.stream().filter((fn) -> (fn.equals("main")))
                         .map((item) -> 1).reduce(i, Integer::sum);
                 if(i != 1) {
-                    Error.message(Error.NO_MAIN, 
+                    Error.message(Exception.Error.NO_MAIN, 
                             "There is no main function");
                 }
                 f.analyze();
@@ -65,7 +71,7 @@ public class Analyzer {
                 if(!vertexNames.contains(v.getIdentifier())) {
                     vertexNames.add(v.getIdentifier());
                 } else {
-                    Error.message(Error.MULTIPLE_IDENTIFIER, 
+                    Error.message(Exception.Error.MULTIPLE_IDENTIFIER, 
                             "Multiple vertex identifier '" + 
                                     v.getIdentifier() + "'");
                 }
@@ -115,7 +121,7 @@ public class Analyzer {
         
         postfixes.stream().forEach((p) -> {
             //System.out.println(Arrays.toString(p));
-            postfixAnalysis(p, vertexDecls, decls);
+            postfixAnalysis(p, vertexDecls);
         });
     }
     
@@ -137,8 +143,7 @@ public class Analyzer {
         }
     }
     
-    private void postfixAnalysis(String[] primaries, ArrayList<Declaration> vd, 
-            ArrayList<Declaration> decls) {
+    private void postfixAnalysis(String[] primaries, ArrayList<Declaration> vd) {
         Declaration declaration = null;
         for(Declaration d : vd) {
             if(d.getIdentifier().equals(primaries[0])) {
@@ -153,7 +158,7 @@ public class Analyzer {
                         .getVertexByIdentifier(declaration.getTypeSpecifier().getText()));
             } else if(primaries[1].startsWith("(")) {
                 // error --> blabla(blabla)
-                Error.message(Error.MEMBER_START_ERROR, 
+                Error.message(Exception.Error.MEMBER_START_ERROR, 
                         "Vertex member does not include parenthesis annotation('" + 
                                 primaries[0] + primaries[1] + "')");
             } else { // starts with '['
@@ -164,17 +169,20 @@ public class Analyzer {
             if(primaries[1].startsWith(".")) {
                 //System.out.println(Arrays.toString(primaries));
             } else if(primaries[1].startsWith("(")){
-                Error.message(Error.MEMBER_START_ERROR, 
+                Error.message(Exception.Error.MEMBER_START_ERROR, 
                         "Vertex member does not include parenthesis annotation('" + 
                                 primaries[0] + primaries[1] + "')");
             } else { // starts with '['
-                Error.message(Error.MEMBER_START_ERROR, 
+                Error.message(Exception.Error.MEMBER_START_ERROR, 
                         "Vertex member does not include bracket annotation('" + 
                                 primaries[0] + primaries[1] + "')");
             }
         } else {
             // it may be struct or union or
             // checking that include libraries or other sources
+            Warning w = new Warning(Exception.Warning.NOT_EXIST_DECLARATION, 
+                    primaries[0] + " has not declaration");
+            warnings.add(w);
         }
     }
     
@@ -192,11 +200,11 @@ public class Analyzer {
                     if(f != null) {
                         v = tree.getVertexByIdentifier(f.getTypeSpecifier().getText());
                         if(v == null && f.getTypeSpecifier().isTypedef()) {
-                            Error.message(Error.NO_VERTEX, "Vertex of member '" + 
+                            Error.message(Exception.Error.NO_VERTEX, "Vertex of member '" + 
                                     primaries[i].substring(1) +"' not found");
                         }
                     } else {
-                        Error.message(Error.NO_FUNCTION, "Vertex " + v.getIdentifier() 
+                        Error.message(Exception.Error.NO_FUNCTION, "Vertex " + v.getIdentifier() 
                                 + " has not this function ('" + primaries[i]
                                         .substring(1) + "')");
                     }
@@ -206,17 +214,17 @@ public class Analyzer {
                     if(d != null) {
                         v = tree.getVertexByIdentifier(d.getTypeSpecifier().getText());
                         if(v == null && d.getTypeSpecifier().isTypedef()) {
-                            Error.message(Error.NO_VERTEX, "Vertex of member '" + 
+                            Error.message(Exception.Error.NO_VERTEX, "Vertex of member '" + 
                                     primaries[i].substring(1) +"' not found");
                         }
                     } else {
-                        Error.message(Error.NO_DECLARATION, "Vertex " + v.getIdentifier() 
+                        Error.message(Exception.Error.NO_DECLARATION, "Vertex " + v.getIdentifier() 
                                 + " has not this declaration ('" + primaries[i]
                                         .substring(1) + "')");
                     }
                 }
             } else {
-                Error.message(Error.NO_VERTEX, "Vertex of member '" + 
+                Error.message(Exception.Error.NO_VERTEX, "Vertex of member '" + 
                                     primaries[i] +"' not found");
             }
         }

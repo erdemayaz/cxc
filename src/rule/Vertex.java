@@ -101,7 +101,7 @@ public class Vertex extends Rule implements RuleAction, Serializable {
         }
         
         if(same) {
-            Error.message(Error.OVERLOADING_ERROR, 
+            Error.message(cxc.Exception.Error.OVERLOADING_ERROR, 
                 "cannot overload with same parameters(function '" 
                         + functions.get(top).getIdentifier() + "')");
         }
@@ -116,7 +116,7 @@ public class Vertex extends Rule implements RuleAction, Serializable {
             for(Function f : functions) {
                 if(f.getIdentifier().equals(identifier)) {
                     if(f.getSpecifiers().size() > 0) {
-                        Error.message(Error.CONSTRUCTOR_SPECIFIER, 
+                        Error.message(cxc.Exception.Error.CONSTRUCTOR_SPECIFIER, 
                             "Vertex constructor cannot has specifier in '" + 
                                     identifier + "'");
                     } else {
@@ -126,7 +126,7 @@ public class Vertex extends Rule implements RuleAction, Serializable {
                 }
             }
             if(cCount > 1) {
-                cxc.Error.message(cxc.Error.MULTIPLE_CONSTRUCTOR, 
+                cxc.Error.message(cxc.Exception.Error.MULTIPLE_CONSTRUCTOR, 
                             "Vertex can only have one constructor(vertex '" + 
                                     identifier + "')");
             } else if(cCount == 1) {
@@ -141,7 +141,7 @@ public class Vertex extends Rule implements RuleAction, Serializable {
                 if(!declarationNames.contains(d.getIdentifier())) {
                     declarationNames.add(d.getIdentifier());
                 } else {
-                    cxc.Error.message(cxc.Error.MULTIPLE_IDENTIFIER, 
+                    cxc.Error.message(cxc.Exception.Error.MULTIPLE_IDENTIFIER, 
                             "Multiple declaration identifier '" + 
                                     d.getIdentifier() + "' in vertex " + 
                                     identifier);

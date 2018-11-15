@@ -5,6 +5,7 @@ double scores[10];
 int main(int argc, char* argv[]) {
 	printf("Hello CX!");
 	Erdem erdem = Erdem();
+	ayaz.test();
 	Erdem myVertexes[10];
 	Erdem myInits[] = {Erdem(), Erdem(), Erdem()};
 	myVertexes[5] = Erdem();

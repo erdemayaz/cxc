@@ -62,7 +62,7 @@ public class Function extends Rule implements RuleAction, Serializable {
     
     private void modifierAnalysis() {
         if(modifier != Modifier.DEFAULT && parent == null) {
-            cxc.Error.message(cxc.Error.INCOMPATIBLE_MODIFIER, 
+            cxc.Error.message(cxc.Exception.Error.INCOMPATIBLE_MODIFIER, 
                     "Usage of modifier is incompatible for function '" 
                             + identifier + "'");
         }
@@ -75,7 +75,7 @@ public class Function extends Rule implements RuleAction, Serializable {
                 if(!declarationNames.contains(d.getIdentifier())) {
                     declarationNames.add(d.getIdentifier());
                 } else {
-                    cxc.Error.message(cxc.Error.MULTIPLE_IDENTIFIER, 
+                    cxc.Error.message(cxc.Exception.Error.MULTIPLE_IDENTIFIER, 
                             "Multiple declaration identifier '" + 
                                     d.getIdentifier() + "' in " + identifier);
                 }
@@ -310,11 +310,13 @@ public class Function extends Rule implements RuleAction, Serializable {
                             VertexDefinitionContext vdctx = 
                                     (VertexDefinitionContext) ctx.parent;
                             if(!f.getIdentifier().equals(vdctx.Identifier().getText())) {
-                                Error.message(Error.NO_SPECIFIER, "Function has not specifier", 
+                                Error.message(cxc.Exception.Error.NO_SPECIFIER, 
+                                        "Function has not specifier", 
                                         Util.getRuleLine(source, ctx));
                             }
                         } else {
-                            Error.message(Error.NO_SPECIFIER, "Function has not specifier", 
+                            Error.message(cxc.Exception.Error.NO_SPECIFIER, 
+                                    "Function has not specifier", 
                                         Util.getRuleLine(source, ctx));
                         }
                     }

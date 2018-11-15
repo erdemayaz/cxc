@@ -88,7 +88,7 @@ public class Expression extends Rule implements RuleAction, Serializable {
         public void enterAssignmentExpression(CXParser.AssignmentExpressionContext ctx) {
             if(ctx.assignmentOperator() != null) {
                 if(ctx.assignmentExpression().assignmentOperator() != null) {
-                    Error.message(Error.MULTIPLE_ASSIGNMENT, 
+                    Error.message(cxc.Exception.Error.MULTIPLE_ASSIGNMENT, 
                             "Multiple assignment in expression statement", 
                             Util.getRuleLine(source, ctx.assignmentExpression()
                                     .assignmentOperator()));

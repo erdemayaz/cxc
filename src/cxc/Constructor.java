@@ -54,7 +54,7 @@ public class Constructor extends CXBaseListener {
         if(ctx.translationUnit() != null) {
             ctx.translationUnit().enterRule(this);
         } else { // empty source
-            Error.message(Error.EMPTY_SOURCE, "Source file empty");
+            Error.message(Exception.Error.EMPTY_SOURCE, "Source file empty");
         }
     }
     

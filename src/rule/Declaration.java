@@ -58,7 +58,7 @@ public class Declaration extends Rule implements RuleAction, Serializable {
     private void modifierAnalysis() {
         if(modifier != Modifier.DEFAULT && 
                 (parent == null || parent.getClass() == Function.class)) {
-            Error.message(Error.INCOMPATIBLE_MODIFIER, 
+            Error.message(cxc.Exception.Error.INCOMPATIBLE_MODIFIER, 
                     "Usage of modifier is incompatible for declaration '" + 
                             identifier + "'");
         }
@@ -66,7 +66,7 @@ public class Declaration extends Rule implements RuleAction, Serializable {
     
     private void typeSpecifierControl() {
         if(getTypeSpecifier() == null) {
-            Error.message(Error.NO_TYPE, "Declaration has not type specifier ('" 
+            Error.message(cxc.Exception.Error.NO_TYPE, "Declaration has not type specifier ('" 
                     + identifier + "')");
         }
     }
@@ -233,14 +233,14 @@ public class Declaration extends Rule implements RuleAction, Serializable {
                     if(ini != null && ini.initializerList() != null) {
                         arraySize = listCount(ini.initializerList(), 3);
                     } else {
-                        Error.message(Error.NO_INITIALIZER_LIST, 
+                        Error.message(cxc.Exception.Error.NO_INITIALIZER_LIST, 
                                 "There is no initializer list", 
                                 Util.getRuleLine(source, dec));
                     }
                 } else {
                     // identifier[expression]
                     if(ini != null) {
-                        Error.message(Error.HAS_INITIALIZER, 
+                        Error.message(cxc.Exception.Error.HAS_INITIALIZER, 
                                 "There is initializer", 
                                 Util.getRuleLine(source, dec));
                     }
@@ -248,7 +248,7 @@ public class Declaration extends Rule implements RuleAction, Serializable {
             } else if(dec.directDeclarator().directDeclarator() != null 
                     && dec.directDeclarator().getChild(1).getText().equals("(")) {
                 // identifier(identifier list)
-                Error.message(Error.INCORRECT_ASSIGNMENT, 
+                Error.message(cxc.Exception.Error.INCORRECT_ASSIGNMENT, 
                                 "Function cannot be assigned anything", 
                                 Util.getRuleLine(source, dec));
             }
