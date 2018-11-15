@@ -17,6 +17,7 @@ public class CXC {
             for(String arg : args) {
                 Interpreter i = new Interpreter(arg);
                 i.viewTree(false);
+                i.viewWarnings(true);
                 ex.submit(i);
             }
             ex.shutdown();

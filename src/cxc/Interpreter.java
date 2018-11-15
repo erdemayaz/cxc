@@ -21,6 +21,7 @@ public class Interpreter extends Thread {
     private CXParser parser;
     private AST tree;
     private boolean viewTree;
+    private boolean viewWarnings;
     private long begin, end;
     
     public Interpreter(String sourceName) {
@@ -32,6 +33,7 @@ public class Interpreter extends Thread {
                     "File extension is not avaible. It must be 'cx'");
         }
         viewTree = false;
+        viewWarnings = false;
     }
     
     private void read() {
@@ -70,7 +72,9 @@ public class Interpreter extends Thread {
     private void analyze() {
         Analyzer a = new Analyzer(tree);
         a.analyze();
-        a.getWarnings().stream().forEach((w) -> { Warning.message(w); });
+        if(viewWarnings) {
+            a.getWarnings().stream().forEach((w) -> { Warning.message(w); });
+        }
     }
     
     private void coding() {
@@ -119,5 +123,9 @@ public class Interpreter extends Thread {
     
     public void viewTree(boolean tree) {
         viewTree = tree;
+    }
+    
+    public void viewWarnings(boolean warning) {
+        viewWarnings = warning;
     }
 }

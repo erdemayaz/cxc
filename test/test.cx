@@ -1,0 +1,47 @@
+
+
+int main(int argc, char* argv[]) {
+	Example e = Example();
+	return 0;
+}
+
+vertex Writer {
+	private char* string;
+	int size = -1;
+	public Writer(char** string) {
+		size = size(string);
+		string = (char*) malloc(sizeof(char) * 256);
+		strcpy(this.string, string);
+	}
+	
+	private int size(char** str) {
+		return strlen(&str);
+	}
+	
+	public void write() {
+		printf("%s - size: %d", string, size);
+	}
+}
+
+vertex Example {
+	Example() {
+		Writer writer = Writer("This is test program");
+		writer.write();
+		Writer writer2 = Writer("This is test program");
+		writer2.write();
+		writer2.write();
+		Writer writer3 = Writer("This is test program");
+		writer3.write();
+		Writer writer4 = Writer("This is test program");
+		writer4.write();
+		arrayTest();
+	}
+	
+	private void arrayTest() {
+		int i;
+		Writer w[10];
+		for(i = 0; i < 10; ++i) {
+			w[i] = Writer("Test");
+		}
+	}
+}

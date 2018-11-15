@@ -82,6 +82,7 @@ public class Analyzer {
     
     private void usageAnalysis() {
         ArrayList<Declaration> decls = new ArrayList<>();
+        ArrayList<Function> funcs = new ArrayList<>();
         ArrayList<Declaration> vertexDecls = new ArrayList<>();
         ArrayList<String[]> postfixes = new ArrayList<>();
         
@@ -94,6 +95,7 @@ public class Analyzer {
                     decls.addAll(f.getDeclarations());
                 setPostfixes(postfixes, f);
             });
+            funcs.addAll(tree.getFunctions());
         }
         
         if(tree.getVertexes() != null) {
@@ -107,6 +109,7 @@ public class Analyzer {
                             decls.addAll(f.getDeclarations());
                         setPostfixes(postfixes, f);
                     });
+                    funcs.addAll(v.getFunctions());
                 }
             });
         }
@@ -120,8 +123,7 @@ public class Analyzer {
         });
         
         postfixes.stream().forEach((p) -> {
-            //System.out.println(Arrays.toString(p));
-            postfixAnalysis(p, vertexDecls);
+            postfixAnalysis(p, vertexDecls, funcs);
         });
     }
     
@@ -143,7 +145,8 @@ public class Analyzer {
         }
     }
     
-    private void postfixAnalysis(String[] primaries, ArrayList<Declaration> vd) {
+    private void postfixAnalysis(String[] primaries, ArrayList<Declaration> vd, 
+            ArrayList<Function> funcs) {
         Declaration declaration = null;
         for(Declaration d : vd) {
             if(d.getIdentifier().equals(primaries[0])) {
@@ -167,7 +170,7 @@ public class Analyzer {
         } else if(primaries[0].equals("this")) {
             primaries[1] = primaries[1].replaceAll("\\s+", "");
             if(primaries[1].startsWith(".")) {
-                //System.out.println(Arrays.toString(primaries));
+                
             } else if(primaries[1].startsWith("(")){
                 Error.message(Exception.Error.MEMBER_START_ERROR, 
                         "Vertex member does not include parenthesis annotation('" + 
@@ -180,9 +183,28 @@ public class Analyzer {
         } else {
             // it may be struct or union or
             // checking that include libraries or other sources
-            Warning w = new Warning(Exception.Warning.NOT_EXIST_DECLARATION, 
-                    primaries[0] + " has not declaration");
-            warnings.add(w);
+            primaries[1] = primaries[1].replaceAll("\\s+", "");
+            if(primaries[1].startsWith(".")) {
+                Warning w = new Warning(Exception.Warning.NOT_EXIST_DECLARATION, 
+                        primaries[0] + " has not declaration");
+                warnings.add(w);
+            } else if(primaries[1].startsWith("(")) {
+                boolean local = false;
+                for(Function f : funcs) {
+                    if(f.getIdentifier().equals(primaries[0])) {
+                        local = true;
+                    }
+                }
+                if(!local) {
+                    Warning w = new Warning(Exception.Warning.NOT_EXIST_DECLARATION, 
+                            primaries[0] + " has not declaration");
+                    warnings.add(w);
+                }
+            } else { // starts with '['
+                Warning w = new Warning(Exception.Warning.NOT_EXIST_DECLARATION, 
+                        primaries[0] + " has not declaration");
+                warnings.add(w);
+            }
         }
     }
     
